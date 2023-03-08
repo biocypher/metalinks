@@ -1,0 +1,39 @@
+title: BioCypher adapter for HMDB interactions
+
+# Nodes
+
+small molecule:
+  represented_as: node
+  preferred_id: HMDB
+  label_in_input: metabolite
+  properties:
+   name: str
+   keggID: str
+   chebiID: str
+   pubchemID: int
+   proteins: str
+   pathways: str
+
+protein:
+  represented_as: node
+  preferred_id: hmdbp_id
+  label_in_input: hmdbp
+  properties:
+    symbol: hgnc
+    uniprot_id: str
+    pathways: str
+    metabolites: str
+
+
+# Edges
+
+small molecule to protein association:
+  is_a: chemical
+  represented_as: edge
+  source: chemical
+  target: gene
+  label_in_input: compoundTarget
+  properties:
+    direction: int
+    type: str
+    source: str
