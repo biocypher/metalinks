@@ -7,6 +7,13 @@ BioCypher - HMDB adapter prototype
 
 from enum import Enum
 from typing import Optional
+import xml.sax.handler
+import xml.etree.ElementTree as ET
+import requests
+import re
+import pandas as pd
+from bs4 import BeautifulSoup
+
 
 import sys
 sys.path.append("/home/efarr/Documents/BC/BioCypher/")
@@ -119,32 +126,14 @@ class HMDBAdapter:
         """
 
         loc_dict = {
-            HMDBNodeType.METABOLITE.value: "/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_metabolites.xml",
+            HMDBNodeType.METABOLITE.value: "/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_metabolites_testing.xml",
             HMDBNodeType.PROTEIN.value: "/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_proteins.xml",
         }
 
-        ### get in the fun !!!! ###
+        handler = HMDBMetaboliteHandler()
+        xml.sax.parse(HMDBNodeType.METABOLITE.value, handler)
 
-        ### outptu format: 3 tuple
-
-        # for label in self.node_types:
-        #     # read csv for each label
-
-        #     with (open(loc_dict[label], "r")) as f:
-
-        #         reader = csv.reader(f)
-        #         prop_items = next(reader)
-
-        #         if self.test_mode:
-        #             reader = islice(reader, 0, 100)
-
-        #         for row in reader:
-        #             _id = _process_node_id(row[0], label)
-        #             _label = label
-        #             _props = self._process_properties(
-        #                 dict(zip(prop_items[1:], row[1:]))
-        #             )
-        #             yield _id, _label, _props
+        extract_protein_data(HMDBNodeType.PROTEIN.value)
 
     def get_edges(self):
         """
@@ -156,56 +145,126 @@ class HMDBAdapter:
         Returns:
             generator of tuples representing edges
         """
+        print(  "Getting edges"  )
+        for reaction_id in range(1, 10):
+            # specify the HMDB webfile URL to be scraped
+            hmdb_url = 'https://hmdb.ca/reactions/' + str(reaction_id)
 
-       # get in the fun !!!!
+            # send a GET request to the HMDB webfile URL and store the response
+            response = requests.get(hmdb_url)
 
-        # output has to be a 5 tuple ?
+            
+            try: 
+                # parse the html using beautiful soup
+                soup = BeautifulSoup(response.text, 'html.parser')
+
+                # find all the reaction panels
+                reaction = soup.find(class_='reaction-panel')
+
+                # extract all the metabolite ids
+                metabolite_ids = re.findall(r'/metabolites/(HMDB\d+)', str(reaction))
+
+                status = reaction.text.split('Status')[1].strip()
+                status = status.split(' ')[0]
 
 
-        # for label in self.edge_types:
+                enzyme_id = re.search(r'/proteins/(HMDBP\d+)', str(reaction)).group(1)
 
-        #     # read csv for each label
-        #     with (open(loc_dict[label], "r")) as f:
+                reaction_str = soup.find(class_='panel-heading').text
+                # split reaction string by either + or = and count how many object were before the =
+                reactands, products = reaction_str.split('=')
+                reactands = reactands.split('+')
 
-        #         reader = csv.reader(f)
-        #         prop_items = next(reader)
+                reactand_ids = metabolite_ids[:len(reactands)]
+                product_ids = metabolite_ids[len(reactands):]
 
-        #         if self.test_mode:
-        #             reader = islice(reader, 0, 100)
+                for reactand in reactands:
+                    if reactand in reactand_ids:
+                        attributes = {'type': 'reactand', 'status': status, 'reaction_id': reaction_id}
+                        yield (reactand, enzyme_id, 'reactand', attributes)
+                    else:    
+                        attributes = {'type': 'product', 'status': status, 'reaction_id': reaction_id}
+                        yield (reactand, enzyme_id, 'product', attributes)
 
-        #         for row in reader:
-        #             _src = self._process_source_id(row[0], label)
-        #             _tar = _process_target_id(row[1], label)
-        #             _label = label
-        #             _props = self._process_properties(
-        #                 dict(zip(prop_items[2:], row[2:]))
-        #             )
-
-        #             if not _src and _tar:
-        #                 continue
-
-        #             yield _src, _tar, _label, _props
-
+            except:
+                print(f'Could not parse reaction {reaction_id}')
+                continue
     
 
 
 # multi-line fields: only due to line 832 in cellModels_all.csv?
 
 
-class HMDBHandler(xml.sax.handler.ContentHandler):
+class HMDBMetaboliteHandler(xml.sax.handler.ContentHandler):
     def __init__(self):
-        # ...
-    
+        self.current_element = ""
+        self.current_element_text = ""
+        self.current_accession = ""
+        self.current_kegg = ""
+        self.current_pubchem = ""
+        self.current_chebi = ""
+        self.current_met_name = ""
+        self.current_name = ""
+        self.current_pathway = ""
+        self.current_pathways = ""
+        self.current_disease = ""
+        self.current_inchi = ""
+        self.protein_dict = {}
+        self.pathway_dict = {}
+        self.disease_dict = {}
+
+        self.accession_array = []
+        self.kegg_array = []
+        self.pubchem_array = []
+        self.chebi_array = []
+        self.protein_array = []
+        self.name_array = []
+        self.pathway_array = []
+        self.disease_array = []
+        self.inchi_array = []
+
+
     def startElement(self, name, attrs):
-        # ...
+        self.current_element = name
 
     def endElement(self, name):
-        # ...
+        print('hello')
+        if name == "accession" and not self.current_accession:
+            self.current_accession = self.current_element_text.strip()
+            self.current_pathways = ""
+        elif name == "kegg_id":
+            self.current_kegg = self.current_element_text.strip()
+        elif name == "inchi":
+            self.current_inchi = self.current_element_text.strip()
+        elif name == "pubchem_compound_id":
+            self.current_pubchem = self.current_element_text.strip()
+        elif name == "chebi_id":
+            self.current_chebi = self.current_element_text.strip()
+        elif name == "name" and not self.current_met_name:
+            self.current_met_name = self.current_element_text.strip()
+        elif name == "protein_accession":
+            protein_accession = self.current_element_text.strip()
+            if protein_accession:
+                self.protein_dict.setdefault(self.current_accession, []).append(protein_accession)
+        elif name == "name" and not self.current_pathways == "pathways":
+            pathway_name = self.current_element_text.strip()
+            if pathway_name:
+                self.pathway_dict.setdefault(self.current_pathway, []).append(pathway_name)
+        elif name == "pathways":
+            self.current_pathways = "pathways"
+
+        self.current_element_text = ""
+        self.current_element = ""
+        
 
         if name == "metabolite" and self.current_accession:
-            yield (self.current_accession, self.current_kegg, self.current_pubchem, self.current_chebi, 
-                   self.current_met_name, self.current_inchi, self.protein_dict.get(self.current_accession, []),
-                   self.pathway_dict.get(self.current_pathway, []))
+            attributes = {'kegg_id': self.current_kegg, 'pubchem_compound_id': self.current_pubchem,
+                            'chebi_id': self.current_chebi, 'name': self.current_met_name, 'inchi': self.current_inchi,
+                            'protein_accession': self.protein_dict.get(self.current_accession, []), 
+                            'pathways': self.pathway_dict.get(self.current_accession, [])
+                            }
+            yield (self.current_accession, self.current_name, attributes)
+
 
             self.current_accession = ""
             self.current_kegg = ""
@@ -219,3 +278,27 @@ class HMDBHandler(xml.sax.handler.ContentHandler):
 
     def characters(self, content):
         self.current_element_text += content
+
+
+
+
+
+def extract_protein_data(path):
+    print('bello')
+    tree = ET.parse(path)
+    root = tree.getroot()
+    for protein in root.findall('.//{http://www.hmdb.ca}protein'):
+        accession = protein.find('{http://www.hmdb.ca}accession').text
+        gene_name = protein.find('{http://www.hmdb.ca}gene_name').text
+        metabolites = protein.findall('.//{http://www.hmdb.ca}metabolite_associations/')
+        pathways = protein.findall('.//{http://www.hmdb.ca}pathways/')
+        metabolite_array = []
+        pathway_array = []
+        for m in metabolites:
+            accession = m.find('{http://www.hmdb.ca}accession').text
+            metabolite_array.append(accession)
+        for p in pathways:
+            name = p.find('{http://www.hmdb.ca}name').text
+            pathway_array.append(name)
+        attributes = {'metabolites': metabolite_array, 'pathways': pathway_array}
+        yield (accession, gene_name, attributes)
