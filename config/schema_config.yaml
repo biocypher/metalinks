@@ -16,10 +16,10 @@ small molecule:
 
 protein:
   represented_as: node
-  preferred_id: uniprot_id
+  preferred_id: uniprot
   label_in_input: protein
   properties:
-    symbol: hgnc
+    symbol: hgnc.symbol
     pathways: str
     metabolites: str
     hmdbp_id: str
