@@ -31,7 +31,7 @@ node_fields = [
     HMDBMetaboliteNodeField.METABOLITE_PATHWAYS,
     HMDBProteinNodeField._PRIMARY_ID,
     HMDBProteinNodeField.PROTEIN_SYMBOL,
-    HMDBProteinNodeField.PROTEIN_UNIPROT_ID,
+    HMDBProteinNodeField.HMDBP_ID,
     HMDBProteinNodeField.PROTEIN_PATHWAYS,
     HMDBProteinNodeField.PROTEIN_METABOLITES,
 
@@ -48,7 +48,8 @@ edge_fields = [
     HMDBMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
     HMDBMetaboliteToProteinEdgeField.TYPE,
     HMDBMetaboliteToProteinEdgeField.SOURCE_DATABASES,
-    HMDBMetaboliteToProteinEdgeField.DIRECTION
+    HMDBMetaboliteToProteinEdgeField.DIRECTION,
+    HMDBMetaboliteToProteinEdgeField.MET_NAME,
 ]
 
 
@@ -70,11 +71,11 @@ def main():
     driver = biocypher.Driver(
         offline=True,
         db_name="neo4j",
-        user_schema_config_path="config/schema_config.yaml",
+        user_schema_config_path="/home/efarr/Documents/GitHub/HMDB-BioCypher/config/schema_config.yaml",
         quote_char='"',
         skip_duplicate_nodes=True,
         skip_bad_relationships=True,
-        strict_mode=True,
+        strict_mode=False,
     )
 
     # check schema
@@ -90,7 +91,7 @@ def main():
     )
 
     # write nodes and edges to csv
-    # driver.write_nodes(HMDB.get_nodes())
+    driver.write_nodes(HMDB.get_nodes())
     driver.write_edges(HMDB.get_edges())
 
     # convenience and stats

@@ -16,24 +16,25 @@ small molecule:
 
 protein:
   represented_as: node
-  preferred_id: hmdbp_id
-  label_in_input: hmdbp
+  preferred_id: uniprot_id
+  label_in_input: protein
   properties:
     symbol: hgnc
-    uniprot_id: str
     pathways: str
     metabolites: str
+    hmdbp_id: str
 
 
 # Edges
 
-small molecule to protein association:
-  is_a: chemical
+small molecule to gene association:
+  is_a: chemical to gene association
   represented_as: edge
-  source: chemical
+  source: small molecule
   target: gene
-  label_in_input: compoundTarget
+  label_in_input: metabolite_to_protein
   properties:
-    direction: int
+    met_name: str
     type: str
-    source: str
+    status: str
+    reaction_id: str
