@@ -1,4 +1,4 @@
-# HMDB-BioCypher
+# metalinks-biocypher
 
 This is the Repo for the Biocypher HMDB adapter
 
