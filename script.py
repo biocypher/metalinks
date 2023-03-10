@@ -2,7 +2,7 @@ import cProfile
 import io
 import pstats
 
-from hmb.adapter import (
+from hmdb.adapter import (
     HMDBAdapter,
     HMDBEdgeType,
     HMDBNodeType,
@@ -71,7 +71,7 @@ def main():
     driver = biocypher.Driver(
         offline=True,
         db_name="neo4j",
-        user_schema_config_path="/home/efarr/Documents/GitHub/HMDB-BioCypher/config/schema_config.yaml",
+        user_schema_config_path="/home/efarr/Documents/GitHub/metalinks-biocypher/config/schema_config.yaml",
         quote_char='"',
         skip_duplicate_nodes=True,
         skip_bad_relationships=True,

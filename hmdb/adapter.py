@@ -11,10 +11,9 @@ import requests
 import re
 import xml.sax.handler
 import xml.etree.ElementTree as ET
-
+import hashlib
 
 from bs4 import BeautifulSoup
-
 from biocypher._logger import logger
 
 logger.debug(f"Loading module {__name__}.")
@@ -74,6 +73,9 @@ class HMDBMetaboliteToProteinEdgeField(Enum):
     """
     Fields available for DepMap gene to gene edges.
     """
+    REACTION_ID = "reactionId"
+    _PRIMARY_REACTION_ID = REACTION_ID
+
 
     METABOLITE_ID = "metaboliteHmdbId:START_ID(Metabolite-ID)"
     _PRIMARY_SOURCE_ID = METABOLITE_ID
@@ -251,7 +253,8 @@ class HMDBAdapter:
                         if (id, enzyme_id) not in a:
                             a.append((id, enzyme_id))
                             uniprot = self.id_conversion[enzyme_id]
-                            yield (id, uniprot, 'metabolite_to_protein', attributes)
+                            edge_id = hashlib.md5((id + uniprot + 'metabolite_to_protein' + str(attributes)).encode('utf-8')).hexdigest()                         
+                            yield (edge_id,  id, uniprot, 'metabolite_to_protein', attributes)
                     else:    
                         attributes = {'met_name' :  name_dict[id],
                                       'type': 'product', 
@@ -262,7 +265,8 @@ class HMDBAdapter:
                         if (id, enzyme_id) not in a:
                             a.append((id, enzyme_id))
                             uniprot = self.id_conversion[enzyme_id]
-                            yield (id, uniprot, 'metabolite_to_protein', attributes)
+                            edge_id = hashlib.md5((id + uniprot + 'metabolite_to_protein' + str(attributes)).encode('utf-8')).hexdigest()
+                            yield (edge_id, id, uniprot, 'metabolite_to_protein', attributes)
             except:
                 print(f'Could not parse reaction {reaction_id}')
                 continue
