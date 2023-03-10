@@ -25,8 +25,8 @@ class HMDBNodeType(Enum):
     HMDB nodes.
     """
 
-    METABOLITE = "metabolite"
-    PROTEIN = "protein"
+    METABOLITE = "hmdb_metabolite"
+    PROTEIN = "hmdb_protein"
 
 
 class HMDBMetaboliteNodeField(Enum):
@@ -38,7 +38,7 @@ class HMDBMetaboliteNodeField(Enum):
     _PRIMARY_ID = METABOLITE_ID
 
     METABOLITE_NAME         = "name"
-    METABOLITE_KEGG_ID      = "keggId"
+    METABOLITE_KEGG_ID      = "kegg_id"
     METABOLITE_CHEBI_ID     = "chebiId"
     METABOLITE_PUBCHEM_ID   = "pubchemId"
     METABOLITE_PROTEINS     = "proteins"
@@ -55,7 +55,7 @@ class HMDBProteinNodeField(Enum):
     _PRIMARY_ID = PROTEIN_ID
 
     PROTEIN_SYMBOL = "symbol"
-    HMDBP_ID = "hmdbp_id"
+    PROTEIN_HMDBP_ID = "hmdbp_id"
     PROTEIN_PATHWAYS = "pathways"
     PROTEIN_METABOLITES = "metabolites"
 
@@ -96,6 +96,7 @@ class HMDBAdapter:
         node_fields: Optional[list] = None,
         edge_types: Optional[list] = None,
         edge_fields: Optional[list] = None,
+        id_conversion: Optional[dict] = None,
         test_mode: bool = False,
     ):
 
@@ -110,6 +111,7 @@ class HMDBAdapter:
         self.data_source = "HMDB"
         self.data_version = "v5.0"
         self.data_licence = "None"
+        self.id_conversion = {}
 
     def get_nodes(self):
         """
@@ -128,7 +130,7 @@ class HMDBAdapter:
 
         print(  "Getting metabolites"  )
 
-        filename = "/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_metabolites_testing.xml"
+        filename = "/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_metabolites.xml"
         handler = HMDBMetaboliteHandler()
         parser = xml.sax.make_parser()
         parser.setContentHandler(handler)
@@ -136,21 +138,24 @@ class HMDBAdapter:
         with open(filename, 'r') as f:
             parser.parse(f)
 
-        for accession, name, attributes in handler.metabolites():
-            yield accession, name, attributes
-
-
-        # handler = HMDBMetaboliteHandler()
-        # test = xml.sax.parse("file:///home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_metabolites_testing.xml", handler)
-
+        for accession, attributes in handler.metabolites():
+            yield accession, 'hmdb_metabolite', attributes
 
 
         print(  "Getting proteins"  )
         path = '/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_proteins.xml'
 
+        # handler = HMDBProteinHandler()
+        # parser = xml.sax.make_parser()
+        # parser.setContentHandler(handler)
+        # proteins = parser.parse(path)
+        # for protein in proteins:
+        #     print(protein)
+        #     yield protein
+
         tree = ET.parse(path)
         root = tree.getroot()
-        b = 0
+        # b = 0
         for protein in root.findall('.//{http://www.hmdb.ca}protein'):
             accession = protein.find('{http://www.hmdb.ca}accession').text
             gene_name = protein.find('{http://www.hmdb.ca}gene_name').text
@@ -159,6 +164,10 @@ class HMDBAdapter:
             pathways = protein.findall('.//{http://www.hmdb.ca}pathways/')
             metabolite_array = []
             pathway_array = []
+            hmdbp_id = accession
+            # add hmdbp_id and uniprot to as key and value to id_conversion dict
+            self.id_conversion[hmdbp_id] = uniprot
+
             for m in metabolites:
                 accession = m.find('{http://www.hmdb.ca}accession').text
                 metabolite_array.append(accession)
@@ -167,13 +176,13 @@ class HMDBAdapter:
                 pathway_array.append(name)
             attributes = {'metabolites': metabolite_array, 
                         'pathways': pathway_array, 
-                        'accession': accession,}
-            b += 1
-            if b == 10:
-                break
-            print(uniprot, gene_name, attributes)
-            yield (uniprot, gene_name, attributes)
-        #ProteinDataExtractor('/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_proteins.xml')
+                        'hmdbp_id': hmdbp_id,
+                        'symbol': gene_name,}
+            # b += 1
+            # if b == 10:
+            #     break
+            yield (uniprot, 'hmdb_protein', attributes)
+
 
     def get_edges(self):
         """
@@ -186,7 +195,11 @@ class HMDBAdapter:
             generator of tuples representing edges
         """
         print(  "Getting edges"  )
-        for reaction_id in range(1, 14):
+
+
+        a = []
+
+        for reaction_id in range(1, 1000):
             # specify the HMDB webfile URL to be scraped
             hmdb_url = 'https://hmdb.ca/reactions/' + str(reaction_id)
 
@@ -210,6 +223,10 @@ class HMDBAdapter:
 
                 enzyme_id = re.search(r'/proteins/(HMDBP\d+)', str(reaction)).group(1)
 
+                external_links = reaction.text.split('External Links')[1].split('Status')[0].strip()
+                if external_links.startswith('Kegg Reaction ID'):
+                    external_links = external_links.split(':')[1].strip()
+
                 reaction_str = soup.find(class_='panel-heading').text
                 # split reaction string by either + or = and count how many object were before the =
                 reactands, products = reaction_str.split('=')
@@ -228,20 +245,24 @@ class HMDBAdapter:
                         attributes = {'met_name' :  name_dict[id],
                                       'type': 'reactand', 
                                       'status': status, 
-                                      'reaction_id': reaction_id}
-                        print(id, enzyme_id, 'reactand', attributes)
-                        yield (id, enzyme_id, 'reactand', attributes)
+                                      'reaction_id': reaction_id,
+                                      'external_links': external_links,
+                                      'hmdbp_id': enzyme_id,}
+                        if (id, enzyme_id) not in a:
+                            a.append((id, enzyme_id))
+                            uniprot = self.id_conversion[enzyme_id]
+                            yield (id, uniprot, 'metabolite_to_protein', attributes)
                     else:    
                         attributes = {'met_name' :  name_dict[id],
                                       'type': 'product', 
                                       'status': status, 
-                                      'reaction_id': reaction_id}
-                        print(id, enzyme_id, 'product', attributes)
-                        yield (id, enzyme_id, 'product', attributes)
-
-
-
-
+                                      'reaction_id': reaction_id, 
+                                      'external_links': external_links,
+                                      'hmdbp_id': enzyme_id,}
+                        if (id, enzyme_id) not in a:
+                            a.append((id, enzyme_id))
+                            uniprot = self.id_conversion[enzyme_id]
+                            yield (id, uniprot, 'metabolite_to_protein', attributes)
             except:
                 print(f'Could not parse reaction {reaction_id}')
                 continue
@@ -250,81 +271,6 @@ class HMDBAdapter:
 
 # multi-line fields: only due to line 832 in cellModels_all.csv?
 
-
-# class HMDBMetaboliteHandler(xml.sax.handler.ContentHandler):
-#     def __init__(self):
-#         self.current_element = ""
-#         self.current_element_text = ""
-#         self.current_accession = ""
-#         self.current_kegg = ""
-#         self.current_pubchem = ""
-#         self.current_chebi = ""
-#         self.current_met_name = ""
-#         self.current_name = ""
-#         self.current_pathway = ""
-#         self.current_pathways = ""
-#         self.current_disease = ""
-#         self.current_inchi = ""
-#         self.protein_dict = {}
-#         self.pathway_dict = {}
-#         self.disease_dict = {}
-
-
-#     def startElement(self, name, attrs):
-#         self.current_element = name
-
-#     def endElement(self, name):
-#         print(name)
-#         if name == "accession" and not self.current_accession:
-#             self.current_accession = self.current_element_text.strip()
-#             self.current_pathways = ""
-#         elif name == "kegg_id":
-#             self.current_kegg = self.current_element_text.strip()
-#         elif name == "inchi":
-#             self.current_inchi = self.current_element_text.strip()
-#         elif name == "pubchem_compound_id":
-#             self.current_pubchem = self.current_element_text.strip()
-#         elif name == "chebi_id":
-#             self.current_chebi = self.current_element_text.strip()
-#         elif name == "name" and not self.current_met_name:
-#             self.current_met_name = self.current_element_text.strip()
-#         elif name == "protein_accession":
-#             protein_accession = self.current_element_text.strip()
-#             if protein_accession:
-#                 self.protein_dict.setdefault(self.current_accession, []).append(protein_accession)
-#         elif name == "name" and not self.current_pathways == "pathways":
-#             pathway_name = self.current_element_text.strip()
-#             if pathway_name:
-#                 self.pathway_dict.setdefault(self.current_pathway, []).append(pathway_name)
-#         elif name == "pathways":
-#             self.current_pathways = "pathways"
-
-#         self.current_element_text = ""
-#         self.current_element = ""
-        
-
-#         if name == "metabolite" and self.current_accession:
-#             print(self.current_accession)
-#             attributes = {'kegg_id': self.current_kegg, 'pubchem_compound_id': self.current_pubchem,
-#                             'chebi_id': self.current_chebi, 'name': self.current_met_name, 'inchi': self.current_inchi,
-#                             'protein_accession': self.protein_dict.get(self.current_accession, []), 
-#                             'pathways': self.pathway_dict.get(self.current_accession, [])
-#                             }
-#             yield (self.current_accession, self.current_name, attributes)
-
-
-#             self.current_accession = ""
-#             self.current_kegg = ""
-#             self.current_pubchem = ""
-#             self.current_chebi = ""
-#             self.current_name = ""
-#             self.current_met_name = ""
-#             self.current_inchi = ""
-#             self.protein_dict = {}
-#             self.pathway_dict = {}
-
-#     def characters(self, content):
-#         self.current_element_text += content
 
 
 class HMDBMetaboliteHandler(xml.sax.handler.ContentHandler):
@@ -381,9 +327,10 @@ class HMDBMetaboliteHandler(xml.sax.handler.ContentHandler):
             attributes = {'kegg_id': self.current_kegg, 'pubchem_compound_id': self.current_pubchem,
                             'chebi_id': self.current_chebi, 'name': self.current_met_name, 'inchi': self.current_inchi,
                             'protein_accession': self.protein_dict.get(self.current_accession, []), 
-                            'pathways': self.pathway_dict.get(self.current_accession, [])
+                            'pathways': self.pathway_dict.get(self.current_pathway, [])
                             }
-            self._metabolites.append((self.current_accession, self.current_name, attributes))
+
+            self._metabolites.append((self.current_accession, attributes))
 
             self.current_accession = ""
             self.current_kegg = ""
@@ -399,7 +346,61 @@ class HMDBMetaboliteHandler(xml.sax.handler.ContentHandler):
         self.current_element_text += content
 
     def metabolites(self):
-        print(self._metabolites)
         return self._metabolites
+    
+
+# class HMDBProteinHandler(xml.sax.ContentHandler):
+#     def __init__(self):
+#         self.proteins = []
+#         self.current_protein = str
+#         self.current_metabolite = str
+#         self.current_pathway = str
+#         self.metabolite_array = []
+#         self.pathway_array = []
+#         self.breaker = 0
+#         self.current_text = ""
+
+#     def startElement(self, name, attrs):
+#         if name == "protein":
+#             self.current_protein = {'uniprot': str, 'hmdbp_id': str, 'symbol': str, 'metabolites': [], 'pathways': []}
+#         elif name == "metabolite_associations":
+#             self.current_metabolite = {}
+#         elif name == "pathways":
+#             self.current_pathway = {}
+
+#     def endElement(self, name):
+#         if name == "protein":
+#             self.breaker += 1
+#             if self.breaker == 10:
+#                 xml.sax.ContentHandler.endDocument(self)
+#             else:
+#                 self.proteins.append((self.current_protein['uniprot'], 'hmdb_protein', self.current_protein))
+#                 self.current_protein = None
+#         elif name == "accession":
+#             if self.current_metabolite:
+#                 print(self.current_text)
+#                 self.current_metabolite['accession'] = self.current_text
+#                 self.current_protein['metabolites'].append(self.current_metabolite['accession'])
+#                 self.current_metabolite = None
+#             else:
+#                 self.current_protein['hmdbp_id'] = self.current_text
+#         elif name == "gene_name":
+#             self.current_protein['symbol'] = self.current_text
+#         elif name == "uniprot_id":
+#             self.current_protein['uniprot'] = self.current_text
+#         elif name == "name":
+#             self.current_pathway['name'] = self.current_text
+#             self.current_protein['pathways'].append(self.current_pathway['name'])
+#             self.current_pathway = None
+
+#         self.current_text = ""
+
+
+
+#     def characters(self, content):
+#         self.current_text += content
+
+
+
 
 

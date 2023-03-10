@@ -31,7 +31,7 @@ node_fields = [
     HMDBMetaboliteNodeField.METABOLITE_PATHWAYS,
     HMDBProteinNodeField._PRIMARY_ID,
     HMDBProteinNodeField.PROTEIN_SYMBOL,
-    HMDBProteinNodeField.HMDBP_ID,
+    HMDBProteinNodeField.PROTEIN_HMDBP_ID,
     HMDBProteinNodeField.PROTEIN_PATHWAYS,
     HMDBProteinNodeField.PROTEIN_METABOLITES,
 
@@ -76,6 +76,7 @@ def main():
         skip_duplicate_nodes=True,
         skip_bad_relationships=True,
         strict_mode=False,
+        delimiter=","
     )
 
     # check schema

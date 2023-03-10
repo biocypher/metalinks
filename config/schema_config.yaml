@@ -5,21 +5,21 @@ title: BioCypher adapter for HMDB interactions
 small molecule:
   represented_as: node
   preferred_id: HMDB
-  label_in_input: metabolite
+  label_in_input: hmdb_metabolite
   properties:
    name: str
-   keggID: str
-   chebiID: str
-   pubchemID: int
-   proteins: str
+   kegg_id: KEGG
+   chebi_id: int
+   pubchem_compound_id: int
+   protein_accession: str
    pathways: str
 
 protein:
   represented_as: node
   preferred_id: uniprot
-  label_in_input: protein
+  label_in_input: hmdb_protein
   properties:
-    symbol: hgnc.symbol
+    symbol: str
     pathways: str
     metabolites: str
     hmdbp_id: str
@@ -31,10 +31,11 @@ small molecule to gene association:
   is_a: chemical to gene association
   represented_as: edge
   source: small molecule
-  target: gene
+  target: protein
   label_in_input: metabolite_to_protein
   properties:
     met_name: str
     type: str
     status: str
-    reaction_id: str
+    reaction_id: int
+    external_links: str

@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+biocypher-out/202303101134/SmallMolecule-part000.csv
+biocypher-out/202303101102/SmallMoleculeToGeneAssociation-header.csv
+biocypher-out/*
+biocypher-log/*
