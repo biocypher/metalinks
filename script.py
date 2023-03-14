@@ -11,6 +11,12 @@ from hmdb.adapter import (
     HMDBMetaboliteToProteinEdgeField,
 )
 
+from stitch.adapter import (
+    STITCHAdapter,
+    STITCHEdgeType,
+    STITCHMetaboliteTOProteinEdgeField,
+)
+
 import biocypher
 
 PROFILE = False
@@ -39,17 +45,28 @@ node_fields = [
 
 
 edge_types = [
-    HMDBEdgeType.METABOLITE_TO_PROTEIN,
+    HMDBEdgeType.PD,
+    STITCHEdgeType.MR,
 
 ]
 
 edge_fields = [
     HMDBMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
     HMDBMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
+    HMDBMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
     HMDBMetaboliteToProteinEdgeField.TYPE,
     HMDBMetaboliteToProteinEdgeField.SOURCE_DATABASES,
     HMDBMetaboliteToProteinEdgeField.DIRECTION,
     HMDBMetaboliteToProteinEdgeField.MET_NAME,
+    STITCHMetaboliteTOProteinEdgeField._PRIMARY_SOURCE_ID,
+    STITCHMetaboliteTOProteinEdgeField._PRIMARY_TARGET_ID,
+    STITCHMetaboliteTOProteinEdgeField._PRIMARY_REACTION_ID,
+    STITCHMetaboliteTOProteinEdgeField.MODE,
+    STITCHMetaboliteTOProteinEdgeField.DATABASE,
+    STITCHMetaboliteTOProteinEdgeField.EXPERIMENT,
+    STITCHMetaboliteTOProteinEdgeField.PREDICTION,
+    STITCHMetaboliteTOProteinEdgeField.TEXTMINING,
+    STITCHMetaboliteTOProteinEdgeField.COMBINED_SCORE,
 ]
 
 
@@ -91,9 +108,16 @@ def main():
         test_mode=True,
     )
 
+    STITCH = STITCHAdapter(
+        edge_types=edge_types,
+        edge_fields=edge_fields,
+        test_mode=True,
+    )
+
     # write nodes and edges to csv
-    driver.write_nodes(HMDB.get_nodes())
-    driver.write_edges(HMDB.get_edges())
+    #driver.write_nodes(HMDB.get_nodes())
+    #driver.write_edges(HMDB.get_edges())
+    driver.write_edges(STITCH.get_edges())
 
     # convenience and stats
     driver.write_import_call()

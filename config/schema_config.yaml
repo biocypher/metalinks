@@ -32,10 +32,25 @@ small molecule to gene association:
   represented_as: edge
   source: small molecule
   target: protein
-  label_in_input: metabolite_to_protein
+  label_in_input: PD
   properties:
     met_name: str
     type: str
     status: str
     reaction_id: int
     external_links: str
+
+small molecule to gene association:
+  is_a: chemical to gene association
+  represented_as: edge
+  source: small molecule
+  target: protein
+  label_in_input: MR
+  properties:
+      mode: str
+      database: int
+      experiment: int
+      prediction: int
+      textmining: int
+      combined_score: int
+
