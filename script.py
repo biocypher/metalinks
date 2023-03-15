@@ -24,6 +24,12 @@ from uniprot_adapter import (
     UniprotNodeField,
 )
 
+from recon.adapter import (
+    ReconAdapter,
+    ReconEdgeType,
+    ReconMetaboliteToProteinEdgeField,
+)
+
 
 import biocypher
 
@@ -75,6 +81,10 @@ stitch_edge_types = [
     STITCHEdgeType.MR,
 ]
 
+recon_edge_types = [
+    ReconEdgeType.PD,
+]
+
 hmdb_edge_fields = [
     HMDBMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
     HMDBMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
@@ -98,6 +108,17 @@ stitch_edge_fields = [
     STITCHMetaboliteToProteinEdgeField.COMBINED_SCORE,
 
 ]
+
+
+recon_edge_fields = [
+    ReconMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
+    ReconMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
+    ReconMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
+    ReconMetaboliteToProteinEdgeField.STATUS,
+    ReconMetaboliteToProteinEdgeField.DIRECTION,
+]
+
+
 def main():
     """
     Connect BioCypher to HMDB adapter to import data into Neo4j.
@@ -155,11 +176,18 @@ def main():
         test_mode=True,
     )
 
+    RECON = ReconAdapter(
+        edge_types=recon_edge_types,
+        edge_fields=recon_edge_fields,
+        test_mode=True,
+    )
+
     # write nodes and edges to csv
-    driver.write_nodes(HMDB.get_nodes())
-    driver.write_nodes(uniprot_adapter.get_nodes())
-    driver.write_edges(HMDB.get_edges())
-    driver.write_edges(STITCH.get_edges())
+    # driver.write_nodes(HMDB.get_nodes())
+    # driver.write_nodes(uniprot_adapter.get_nodes())
+    # driver.write_edges(HMDB.get_edges())
+    # driver.write_edges(STITCH.get_edges())
+    driver.write_edges(RECON.get_edges())
 
     # convenience and stats
     driver.write_import_call()

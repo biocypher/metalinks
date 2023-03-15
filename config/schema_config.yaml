@@ -43,6 +43,18 @@ production degradation metabolite protein interaction:
     reaction_id: int
     external_links: str
 
+
+recon production degradation metabolite protein interaction:
+  is_a: chemical to gene association
+  represented_as: edge
+  source: small molecule
+  target: protein
+  label_in_input: PD
+  properties:
+    status: str
+    direction: str
+
+
 communication metabolite protein interaction:
   is_a: chemical to gene association
   represented_as: edge
