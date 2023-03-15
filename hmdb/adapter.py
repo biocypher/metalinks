@@ -12,6 +12,7 @@ import re
 import xml.sax.handler
 import xml.etree.ElementTree as ET
 import hashlib
+from tqdm import tqdm
 
 from bs4 import BeautifulSoup
 from biocypher._logger import logger
@@ -97,22 +98,15 @@ class HMDBAdapter:
         node_fields: Optional[list] = None,
         edge_types: Optional[list] = None,
         edge_fields: Optional[list] = None,
-        id_conversion: Optional[dict] = None,
         test_mode: bool = False,
     ):
 
         self.id_batch_size = id_batch_size
-
-        # self._set_up_types_and_fields(
-        #     node_types, node_fields, edge_types, edge_fields
-        # )
-
         self.test_mode = test_mode
 
         self.data_source = "HMDB"
         self.data_version = "v5.0"
         self.data_licence = "None"
-        self.id_conversion = {}
 
     def get_nodes(self):
         """
@@ -124,14 +118,10 @@ class HMDBAdapter:
         Returns:
             generator of tuples representing nodes
         """
-        # loc_dict = {
-        #     HMDBNodeType.METABOLITE.value: "/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_metabolites_testing.xml",
-        #     HMDBNodeType.PROTEIN.value: "/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_proteins.xml",
-        # }
 
         print(  "Getting metabolites"  )
 
-        filename = "/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_metabolites.xml"
+        filename = "/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_metabolites_testing.xml"
         handler = HMDBMetaboliteHandler()
         parser = xml.sax.make_parser()
         parser.setContentHandler(handler)
@@ -139,50 +129,8 @@ class HMDBAdapter:
         with open(filename, 'r') as f:
             parser.parse(f)
 
-        for accession, attributes in handler.metabolites():
+        for accession, attributes in tqdm(handler.metabolites()):
             yield accession, 'hmdb_metabolite', attributes
-
-
-        print(  "Getting proteins"  )
-        path = '/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_proteins.xml'
-
-        # handler = HMDBProteinHandler()
-        # parser = xml.sax.make_parser()
-        # parser.setContentHandler(handler)
-        # proteins = parser.parse(path)
-        # for protein in proteins:
-        #     print(protein)
-        #     yield protein
-
-        tree = ET.parse(path)
-        root = tree.getroot()
-        # b = 0
-        for protein in root.findall('.//{http://www.hmdb.ca}protein'):
-            accession = protein.find('{http://www.hmdb.ca}accession').text
-            gene_name = protein.find('{http://www.hmdb.ca}gene_name').text
-            uniprot = protein.find('{http://www.hmdb.ca}uniprot_id').text
-            metabolites = protein.findall('.//{http://www.hmdb.ca}metabolite_associations/')
-            pathways = protein.findall('.//{http://www.hmdb.ca}pathways/')
-            metabolite_array = []
-            pathway_array = []
-            hmdbp_id = accession
-            # add hmdbp_id and uniprot to as key and value to id_conversion dict
-            self.id_conversion[hmdbp_id] = uniprot
-
-            for m in metabolites:
-                accession = m.find('{http://www.hmdb.ca}accession').text
-                metabolite_array.append(accession)
-            for p in pathways:
-                name = p.find('{http://www.hmdb.ca}name').text
-                pathway_array.append(name)
-            attributes = {'metabolites': metabolite_array, 
-                        'pathways': pathway_array, 
-                        'hmdbp_id': hmdbp_id,
-                        'symbol': gene_name,}
-            # b += 1
-            # if b == 10:
-            #     break
-            yield (uniprot, 'hmdb_protein', attributes)
 
 
     def get_edges(self):
@@ -195,12 +143,30 @@ class HMDBAdapter:
         Returns:
             generator of tuples representing edges
         """
-        print(  "Getting edges"  )
+        
+        print(  "Getting mappings"  )
 
+        path = '/home/efarr/Documents/metalinks/Data/Source/HMDB/hmdb_proteins.xml'
+
+        tree = ET.parse(path)
+        root = tree.getroot()
+        
+        accession_array = []
+        uniprot_array = []
+        
+        for protein in tqdm(root.findall('.//{http://www.hmdb.ca}protein')):
+            accession = protein.find('{http://www.hmdb.ca}accession').text
+            uniprot = protein.find('{http://www.hmdb.ca}uniprot_id').text
+            accession_array.append(accession)
+            uniprot_array.append(uniprot)
+ 
+        id_conversion = dict(zip(accession_array, uniprot_array))
+
+        print(  "Getting edges"  )
 
         a = []
 
-        for reaction_id in range(1, 1000):
+        for reaction_id in tqdm(range(1, 18)):
             # specify the HMDB webfile URL to be scraped
             hmdb_url = 'https://hmdb.ca/reactions/' + str(reaction_id)
 
@@ -223,10 +189,13 @@ class HMDBAdapter:
 
 
                 enzyme_id = re.search(r'/proteins/(HMDBP\d+)', str(reaction)).group(1)
-
-                external_links = reaction.text.split('External Links')[1].split('Status')[0].strip()
-                if external_links.startswith('Kegg Reaction ID'):
-                    external_links = external_links.split(':')[1].strip()
+                
+                if 'External Links' in reaction.text:
+                    external_links = reaction.text.split('External Links')[1].split('Status')[0].strip()
+                    if external_links.startswith('Kegg Reaction ID'):
+                        external_links = external_links.split(':')[1].strip()
+                else:
+                    external_links = 'Not available'
 
                 reaction_str = soup.find(class_='panel-heading').text
                 # split reaction string by either + or = and count how many object were before the =
@@ -251,9 +220,9 @@ class HMDBAdapter:
                                       'hmdbp_id': enzyme_id,}
                         if (id, enzyme_id) not in a:
                             a.append((id, enzyme_id))
-                            uniprot = self.id_conversion[enzyme_id]
-                            edge_id = hashlib.md5((id + uniprot + 'PD' + str(attributes)).encode('utf-8')).hexdigest()                         
-                            yield (edge_id,  id, uniprot, 'PD', attributes)
+                            uniprot = id_conversion[enzyme_id]
+                            edge_id = hashlib.md5((id + uniprot + 'PD' + str(attributes)).encode('utf-8')).hexdigest()                       
+                            yield edge_id,  id, uniprot, 'PD', attributes
                     else:    
                         attributes = {'met_name' :  name_dict[id],
                                       'type': 'product', 
@@ -263,16 +232,13 @@ class HMDBAdapter:
                                       'hmdbp_id': enzyme_id,}
                         if (id, enzyme_id) not in a:
                             a.append((id, enzyme_id))
-                            uniprot = self.id_conversion[enzyme_id]
+                            uniprot = id_conversion[enzyme_id]
                             edge_id = hashlib.md5((id + uniprot + 'PD' + str(attributes)).encode('utf-8')).hexdigest()
-                            yield (edge_id, id, uniprot, 'PD', attributes)
+                            yield edge_id, id, uniprot, 'PD', attributes
             except:
                 print(f'Could not parse reaction {reaction_id}')
                 continue
-    
 
-
-# multi-line fields: only due to line 832 in cellModels_all.csv?
 
 
 
@@ -352,56 +318,6 @@ class HMDBMetaboliteHandler(xml.sax.handler.ContentHandler):
         return self._metabolites
     
 
-# class HMDBProteinHandler(xml.sax.ContentHandler):
-#     def __init__(self):
-#         self.proteins = []
-#         self.current_protein = str
-#         self.current_metabolite = str
-#         self.current_pathway = str
-#         self.metabolite_array = []
-#         self.pathway_array = []
-#         self.breaker = 0
-#         self.current_text = ""
-
-#     def startElement(self, name, attrs):
-#         if name == "protein":
-#             self.current_protein = {'uniprot': str, 'hmdbp_id': str, 'symbol': str, 'metabolites': [], 'pathways': []}
-#         elif name == "metabolite_associations":
-#             self.current_metabolite = {}
-#         elif name == "pathways":
-#             self.current_pathway = {}
-
-#     def endElement(self, name):
-#         if name == "protein":
-#             self.breaker += 1
-#             if self.breaker == 10:
-#                 xml.sax.ContentHandler.endDocument(self)
-#             else:
-#                 self.proteins.append((self.current_protein['uniprot'], 'hmdb_protein', self.current_protein))
-#                 self.current_protein = None
-#         elif name == "accession":
-#             if self.current_metabolite:
-#                 print(self.current_text)
-#                 self.current_metabolite['accession'] = self.current_text
-#                 self.current_protein['metabolites'].append(self.current_metabolite['accession'])
-#                 self.current_metabolite = None
-#             else:
-#                 self.current_protein['hmdbp_id'] = self.current_text
-#         elif name == "gene_name":
-#             self.current_protein['symbol'] = self.current_text
-#         elif name == "uniprot_id":
-#             self.current_protein['uniprot'] = self.current_text
-#         elif name == "name":
-#             self.current_pathway['name'] = self.current_text
-#             self.current_protein['pathways'].append(self.current_pathway['name'])
-#             self.current_pathway = None
-
-#         self.current_text = ""
-
-
-
-#     def characters(self, content):
-#         self.current_text += content
 
 
 

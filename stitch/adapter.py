@@ -11,6 +11,7 @@ import pandas as pd
 import numpy as np
 import hashlib
 from pypath.utils import mapping
+from tqdm import tqdm
 
 from biocypher._logger import logger
 
@@ -22,7 +23,7 @@ class STITCHEdgeType(Enum):
     """
     MR = "MR"
 
-class STITCHMetaboliteTOProteinEdgeField(Enum):
+class STITCHMetaboliteToProteinEdgeField(Enum):
     """
     STITCH metabolite to protein edge fields.
     """
@@ -68,7 +69,7 @@ class STITCHAdapter:
         metabolite_map_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/hmdb_metabolites.csv'
 
 
-        for hash, source, target, label, attributes in details_generator(details_path, actions_path, metabolite_map_path):
+        for hash, source, target, label, attributes in tqdm(details_generator(details_path, actions_path, metabolite_map_path)):
             yield hash, source, target, label, attributes
 
 def details_generator(details_file, actions_file, metabolite_map_path ):

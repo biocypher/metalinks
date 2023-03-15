@@ -1,33 +1,44 @@
 import cProfile
 import io
 import pstats
+import sys
+sys.path.append("/home/efarr/Documents/BC/CROssBAR-BioCypher-Migration/bccb/")
 
 from hmdb.adapter import (
     HMDBAdapter,
     HMDBEdgeType,
     HMDBNodeType,
     HMDBMetaboliteNodeField,
-    HMDBProteinNodeField,
     HMDBMetaboliteToProteinEdgeField,
 )
 
 from stitch.adapter import (
     STITCHAdapter,
     STITCHEdgeType,
-    STITCHMetaboliteTOProteinEdgeField,
+    STITCHMetaboliteToProteinEdgeField,
 )
+
+from uniprot_adapter import (
+    Uniprot,
+    UniprotNodeType,
+    UniprotNodeField,
+)
+
 
 import biocypher
 
 PROFILE = False
 
 # Configure node types and fields
-node_types = [
+hmdb_node_types = [
     HMDBNodeType.METABOLITE,
-    HMDBNodeType.PROTEIN,
 ]
 
-node_fields = [
+uniprot_node_types = [
+    UniprotNodeType.PROTEIN,
+]
+
+hmdb_node_fields = [
     HMDBMetaboliteNodeField._PRIMARY_ID,
     HMDBMetaboliteNodeField.METABOLITE_NAME,
     HMDBMetaboliteNodeField.METABOLITE_KEGG_ID,
@@ -35,22 +46,36 @@ node_fields = [
     HMDBMetaboliteNodeField.METABOLITE_PUBCHEM_ID,
     HMDBMetaboliteNodeField.METABOLITE_PROTEINS,
     HMDBMetaboliteNodeField.METABOLITE_PATHWAYS,
-    HMDBProteinNodeField._PRIMARY_ID,
-    HMDBProteinNodeField.PROTEIN_SYMBOL,
-    HMDBProteinNodeField.PROTEIN_HMDBP_ID,
-    HMDBProteinNodeField.PROTEIN_PATHWAYS,
-    HMDBProteinNodeField.PROTEIN_METABOLITES,
+]
+
+uniprot_node_fields = [
+    UniprotNodeField.PROTEIN_SECONDARY_IDS,
+    UniprotNodeField.PROTEIN_LENGTH,
+    UniprotNodeField.PROTEIN_MASS,
+    UniprotNodeField.PROTEIN_ORGANISM,
+    UniprotNodeField.PROTEIN_ORGANISM_ID,
+    UniprotNodeField.PROTEIN_NAMES,
+    UniprotNodeField.PROTEIN_PROTEOME,
+    UniprotNodeField.PROTEIN_EC,
+    UniprotNodeField.PROTEIN_GENE_NAMES,
+    UniprotNodeField.PROTEIN_ENSEMBL_TRANSCRIPT_IDS,
+    UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS,
+    UniprotNodeField.PROTEIN_ENTREZ_GENE_IDS,
+    UniprotNodeField.PROTEIN_VIRUS_HOSTS,
+    UniprotNodeField.PROTEIN_KEGG_IDS,
 
 ]
 
-
-edge_types = [
+hmdb_edge_types = [
     HMDBEdgeType.PD,
-    STITCHEdgeType.MR,
 
 ]
 
-edge_fields = [
+stitch_edge_types = [
+    STITCHEdgeType.MR,
+]
+
+hmdb_edge_fields = [
     HMDBMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
     HMDBMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
     HMDBMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
@@ -58,18 +83,21 @@ edge_fields = [
     HMDBMetaboliteToProteinEdgeField.SOURCE_DATABASES,
     HMDBMetaboliteToProteinEdgeField.DIRECTION,
     HMDBMetaboliteToProteinEdgeField.MET_NAME,
-    STITCHMetaboliteTOProteinEdgeField._PRIMARY_SOURCE_ID,
-    STITCHMetaboliteTOProteinEdgeField._PRIMARY_TARGET_ID,
-    STITCHMetaboliteTOProteinEdgeField._PRIMARY_REACTION_ID,
-    STITCHMetaboliteTOProteinEdgeField.MODE,
-    STITCHMetaboliteTOProteinEdgeField.DATABASE,
-    STITCHMetaboliteTOProteinEdgeField.EXPERIMENT,
-    STITCHMetaboliteTOProteinEdgeField.PREDICTION,
-    STITCHMetaboliteTOProteinEdgeField.TEXTMINING,
-    STITCHMetaboliteTOProteinEdgeField.COMBINED_SCORE,
+
 ]
 
+stitch_edge_fields = [
+    STITCHMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
+    STITCHMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
+    STITCHMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
+    STITCHMetaboliteToProteinEdgeField.MODE,
+    STITCHMetaboliteToProteinEdgeField.DATABASE,
+    STITCHMetaboliteToProteinEdgeField.EXPERIMENT,
+    STITCHMetaboliteToProteinEdgeField.PREDICTION,
+    STITCHMetaboliteToProteinEdgeField.TEXTMINING,
+    STITCHMetaboliteToProteinEdgeField.COMBINED_SCORE,
 
+]
 def main():
     """
     Connect BioCypher to HMDB adapter to import data into Neo4j.
@@ -101,22 +129,36 @@ def main():
 
     # create adapter
     HMDB = HMDBAdapter(
-        node_types=node_types,
-        node_fields=node_fields,
-        edge_types=edge_types,
-        edge_fields=edge_fields,
+        node_types=hmdb_node_types,
+        node_fields=hmdb_node_fields,
+        edge_types=hmdb_edge_types,
+        edge_fields=hmdb_edge_fields,
         test_mode=True,
     )
 
+    uniprot_adapter = Uniprot(
+            organism="9606",
+            node_types=uniprot_node_types,
+            node_fields=uniprot_node_fields,
+            test_mode=True,
+        )
+    
+    uniprot_adapter.download_uniprot_data(
+        cache=True,
+        retries=5,
+    )
+
+
     STITCH = STITCHAdapter(
-        edge_types=edge_types,
-        edge_fields=edge_fields,
+        edge_types=stitch_edge_types,
+        edge_fields=stitch_edge_fields,
         test_mode=True,
     )
 
     # write nodes and edges to csv
-    #driver.write_nodes(HMDB.get_nodes())
-    #driver.write_edges(HMDB.get_edges())
+    driver.write_nodes(HMDB.get_nodes())
+    driver.write_nodes(uniprot_adapter.get_nodes())
+    driver.write_edges(HMDB.get_edges())
     driver.write_edges(STITCH.get_edges())
 
     # convenience and stats

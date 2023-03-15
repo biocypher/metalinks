@@ -11,23 +11,26 @@ small molecule:
    kegg_id: KEGG
    chebi_id: int
    pubchem_compound_id: int
-   protein_accession: str
-   pathways: str
+   protein_accession: str{}
+   pathways: str{}
 
 protein:
   represented_as: node
   preferred_id: uniprot
-  label_in_input: hmdb_protein
+  label_in_input: protein
   properties:
-    symbol: str
-    pathways: str
-    metabolites: str
-    hmdbp_id: str
-
+    secondary_ids: str[]
+    length: int
+    mass: int
+    protein_names: str[]
+    proteome: str[]
+    organism_id: int
+    ec: str[]
+    virus_hosts: int[] 
 
 # Edges
 
-small molecule to gene association:
+production degradation metabolite protein interaction:
   is_a: chemical to gene association
   represented_as: edge
   source: small molecule
@@ -40,7 +43,7 @@ small molecule to gene association:
     reaction_id: int
     external_links: str
 
-small molecule to gene association:
+communication metabolite protein interaction:
   is_a: chemical to gene association
   represented_as: edge
   source: small molecule
