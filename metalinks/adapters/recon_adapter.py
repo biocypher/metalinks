@@ -64,10 +64,9 @@ class ReconAdapter:
         Get edges from RECON.
         """
 
-        recon_path = '/home/efarr/Documents/metalinks/Data/Source/Recon/Recon3D_301.mat'
+        recon_path = 'data/Recon3D_301.mat'
+        recon_symbols_path = 'data/recon_gene_symbols.csv'
 
-        # find better solut ion for this
-        recon_symbols_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Recon/recon_gene_symbols.csv'
         map1_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/global_ID_mapping_curated.tsv'
         map2_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/metmap_curated.csv'
         map3_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/hmdb_metabolites.csv'

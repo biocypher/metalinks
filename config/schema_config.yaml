@@ -11,8 +11,8 @@ small molecule:
    kegg_id: KEGG
    chebi_id: int
    pubchem_compound_id: int
-   protein_accession: str{}
-   pathways: str{}
+  #  protein_accession: str{}
+  #  pathways: str{}
 
 protein:
   represented_as: node
@@ -30,6 +30,13 @@ protein:
 
 # Edges
 
+enzymatic interaction:
+  is_a: chemical to gene association
+
+enzymatic production:
+  is_a: enzymatic interaction
+
+
 production degradation metabolite protein interaction:
   is_a: chemical to gene association
   represented_as: edge
@@ -37,11 +44,11 @@ production degradation metabolite protein interaction:
   target: protein
   label_in_input: PD
   properties:
-    met_name: str
-    type: str
+    # met_name: str
+    direction: str
     status: str
     reaction_id: int
-    external_links: str
+    # external_links: str
 
 
 recon production degradation metabolite protein interaction:
