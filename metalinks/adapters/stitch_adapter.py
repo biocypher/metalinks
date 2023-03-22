@@ -7,11 +7,9 @@ BioCypher - stitch adapter prototype
 
 from enum import Enum
 from typing import Optional
-import pandas as pd
-import numpy as np
-import hashlib
 from pypath.utils import mapping
-from tqdm import tqdm
+from pypath.inputs import hmdb
+import polars as pl
 
 from biocypher._logger import logger
 
@@ -64,75 +62,69 @@ class STITCHAdapter:
         Get edges from STITCH.
         """
 
+        print( 'Getting MR connections from STITCH... ')
+              
+        # prepare stitch data
         details_path = '/home/efarr/Documents/metalinks/Data/Source/Stitch/9606.protein_chemical.links.detailed.v5.0.tsv'
         actions_path = '/home/efarr/Documents/metalinks/Data/Source/Stitch/9606.actions.v5.0.tsv'
-        metabolite_map_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/hmdb_metabolites.csv'
 
+        actions = pl.scan_csv(actions_path, sep='\t')
+        flipped = actions.filter(pl.col('item_id_a').str.contains('9606')).select(['item_id_b', 'item_id_a', 'mode'])
+        df1 = flipped.collect()
+        df1 = df1.rename({'item_id_a': 'protein', 'item_id_b': 'chemical', 'mode': 'mode'})
 
-        for hash, source, target, label, attributes in tqdm(details_generator(details_path, actions_path, metabolite_map_path)):
-            yield hash, source, target, label, attributes
+        normal = actions.filter(pl.col('item_id_b').str.contains('9606')).select(['item_id_a', 'item_id_b', 'mode'])
+        df2 = normal.collect()
+        df2 = df2.rename({'item_id_a': 'chemical', 'item_id_b': 'protein', 'mode': 'mode'})
+        df = pl.concat([df1, df2], how='vertical')
 
-def details_generator(details_file, actions_file, metabolite_map_path ):
-    actions = pd.read_csv(actions_file, sep='\t', dtype=str, usecols=['item_id_a', 'item_id_b', 'mode'])
-    actions['chemical'], actions['protein'] = np.where(actions['item_id_a'].str.startswith('9606'),
-                                                    (actions['item_id_b'], actions['item_id_a']),
-                                                    (actions['item_id_a'], actions['item_id_b']))
-    actions.drop(columns=['item_id_a', 'item_id_b'], inplace=True)
+        details = pl.scan_csv(details_path, sep='\t')
+        data = details.collect()
 
-    details_chunks = pd.read_csv(details_file, sep='\t', dtype=str, chunksize=1000000)
-    map_table = pd.read_csv(metabolite_map_path, sep=',', dtype=str)
-    map_table.dropna(subset= ['pubchem_id'], inplace=True)
-    map_dict = dict(zip(map_table['pubchem_id'].astype(int) , map_table['accession']))
+        d = data.join(df, on=['chemical', 'protein'], how='left')
+        del data
+        del df
+        d = d.filter((pl.col('combined_score') > 700) & (pl.col('mode').is_not_null()) ) # change to lower cutoff later
 
-    counter = 0
-    for details_chunk in details_chunks:
-        merged = pd.merge(details_chunk, actions, on=['chemical', 'protein'], how='left')
-        merged.drop_duplicates(subset=['chemical', 'protein', 'mode'], inplace=True)
-        merged['protein'] = merged['protein'].str.replace('9606.', '')
-        merged['protein'] = ensp_to_genesymbol(merged['protein'])
-        merged['chemical'] = merged['chemical'].str[4:].astype(int)
-        merged['chemical'] = merged['chemical'].map(map_dict)
-        merged.dropna(subset=['chemical'], inplace=True)
-       
-        # change dtype of merge to str
-        merged = merged.astype(str)
+        #aesthetics
+        d = d.with_columns(pl.col('protein').str.replace('9606.', ''))
+        d = d.with_columns(pl.col('chemical').str.slice(4, None))
+        d = d.with_columns(pl.col('chemical').cast(pl.Int64))
 
+        # mapping
+        map_dict = hmdb.hmdb_mapping('pubchem_compound_id', 'accession', head = 10)
+        for k, v in map_dict.items():
+            map_dict[k] = v.pop()
+        d = d.with_columns(pl.col('chemical').cast(pl.Utf8))
+        d = d.with_columns(pl.col('chemical').map_dict(map_dict).alias('metabolite'))
+        d = d.filter(pl.col('metabolite').is_not_null())
+        
+        # add as hash per reaction
+        reaction_id = d.hash_rows(seed=42) # change to md5 later
+        d = d.with_columns(reaction_id)
+        d = d.rename({'': 'reaction_id'})
 
-        counter += 1
-        if counter > 1:
-            break
+        counter = 0
 
-        for _, row in merged.iterrows():
-            r = row.astype(str)
-            h = hashlib.md5(''.join(r).encode('utf-8')).hexdigest()
-            if pd.notna(row['mode']):
-                attributes = { 'mode': row['mode'], **row[2:].to_dict()}
-                yield h, row['chemical'], row['protein'], 'MR', attributes
-            else:
-                attributes = { **row[2:].to_dict()}
-                yield h, row['chemical'], row['protein'], 'MR', attributes
-
+        for row in d.iterrows():
+            attributes = {'mode': row[7], 
+                          'database': row[2], 
+                          'experiment': row[3], 
+                          'prediction': row[4], 
+                          'textmining': row[5], 
+                          'combined_score': row[6],
+                        }
             
-def ensp_to_genesymbol(ensp_list):
-    gene_symbol_list = []
-    for element in ensp_list:
-        symbol = mapping.map_name(element, 'ensp_biomart', 'uniprot')
-        if symbol != set():
-            gene_symbol_list.append(symbol.pop())
-        else:
-            symbol = mapping.map_name(element, 'ensp', 'uniprot')
-            if symbol != set():
-                gene_symbol_list.append(symbol.pop())
+            uniprot = mapping.map_name(row[1], 'ensp_biomart', 'uniprot')
+            if uniprot is None:
+                uniprot = mapping.map_name(row[1], 'ensp', 'uniprot')
+            if uniprot != set():
+                uniprot = uniprot.pop()
             else:
-                gene_symbol_list.append('NA')
-    return gene_symbol_list
+                continue
 
+            counter += 1
+            if counter > 100:
+                break
 
-
-
-
-
-
-
-
-
+            yield row[9], row[8], uniprot, 'MR', attributes
