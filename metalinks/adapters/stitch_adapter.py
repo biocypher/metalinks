@@ -81,32 +81,30 @@ class STITCHAdapter:
         details = pl.scan_csv(details_path, sep='\t')
         data = details.collect()
 
-        d = data.join(df, on=['chemical', 'protein'], how='left')
+        interactions = data.join(df, on=['chemical', 'protein'], how='left')
         del data
         del df
-        d = d.filter((pl.col('combined_score') > 700) & (pl.col('mode').is_not_null()) ) # change to lower cutoff later
+        interactions = interactions.filter((pl.col('combined_score') > 700) & (pl.col('mode').is_not_null()) ) # change to lower cutoff later
 
         #aesthetics
-        d = d.with_columns(pl.col('protein').str.replace('9606.', ''))
-        d = d.with_columns(pl.col('chemical').str.slice(4, None))
-        d = d.with_columns(pl.col('chemical').cast(pl.Int64))
+        interactions = interactions.with_columns(pl.col('protein').str.replace('9606.', ''))
+        interactions = interactions.with_columns(pl.col('chemical').str.slice(4, None).cast(pl.Int64))
 
         # mapping
         map_dict = hmdb.hmdb_mapping('pubchem_compound_id', 'accession', head = 10)
         for k, v in map_dict.items():
             map_dict[k] = v.pop()
-        d = d.with_columns(pl.col('chemical').cast(pl.Utf8))
-        d = d.with_columns(pl.col('chemical').map_dict(map_dict).alias('metabolite'))
-        d = d.filter(pl.col('metabolite').is_not_null())
-        
+        interactions = interactions.with_columns(pl.col('chemical').cast(pl.Utf8).map_dict(map_dict).alias('metabolite'))
+        interactions = interactions.filter(pl.col('metabolite').is_not_null())
+
         # add as hash per reaction
-        reaction_id = d.hash_rows(seed=42) # change to md5 later
-        d = d.with_columns(reaction_id)
-        d = d.rename({'': 'reaction_id'})
+        reaction_id  = interactions.hash_rows(seed=42) # change to md5 later
+        interactions = interactions.with_columns(reaction_id)
+        interactions = interactions.rename({'': 'reaction_id'})
 
         counter = 0
 
-        for row in d.iterrows():
+        for row in interactions.iterrows():
             attributes = {'mode': row[7], 
                           'database': row[2], 
                           'experiment': row[3], 
@@ -119,7 +117,8 @@ class STITCHAdapter:
             if uniprot is None:
                 uniprot = mapping.map_name(row[1], 'ensp', 'uniprot')
             if uniprot != set():
-                uniprot = uniprot.pop()
+                uniprot =  'uniprot:' + uniprot.pop()
+
             else:
                 continue
 

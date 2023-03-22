@@ -30,11 +30,11 @@ protein:
 
 # Edges
 
-enzymatic interaction:
-  is_a: chemical to gene association
+# enzymatic interaction:
+#   is_a: chemical to gene association
 
-enzymatic production:
-  is_a: enzymatic interaction
+# enzymatic production:
+#   is_a: enzymatic interaction
 
 
 production degradation metabolite protein interaction:

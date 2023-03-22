@@ -13,7 +13,6 @@ import hashlib
 from pypath.utils import mapping
 from tqdm import tqdm
 import numpy as np
-import pandas as pd
 import scipy.io as sio
 from pypath.utils import mapping
 
@@ -67,10 +66,10 @@ class ReconAdapter:
         recon_path = 'data/Recon3D_301.mat'
         recon_symbols_path = 'data/recon_gene_symbols.csv'
 
-        map1_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/global_ID_mapping_curated.tsv'
-        map2_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/metmap_curated.csv'
-        map3_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/hmdb_metabolites.csv'
-        map4_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/recon3D_anno_curated.csv'
+        map1_path = 'data/mapping_tables/global_ID_mapping_curated.tsv'
+        map2_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/data/mapping_tables/metmap_curated.csv'
+        map3_path = 'data/mapping_tables/hmdb_mapping.csv'
+        # map4_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/recon3D_anno_curated.csv'
 
         recon = sio.loadmat(recon_path)
         symbols = pd.read_csv(recon_symbols_path, sep=';')
@@ -104,7 +103,19 @@ class ReconAdapter:
         metmap1 = pd.read_csv(map1_path, sep='\t', dtype=object)
         metmap2 = pd.read_csv(map2_path, sep='\t', dtype=str)
         metmap3 = pd.read_csv(map3_path, sep=',', dtype=str)
-        df =      pd.read_csv(map4_path, sep=',', dtype=str)
+
+        field_names = ['metPubChemID',  'metHMDBID', 'metKEGGID', 'metCHEBIID',  'mets']
+
+        df = pd.DataFrame(columns=field_names)
+        for field_name in field_names:
+            df[field_name] = data[field_name][0][0].flatten()
+            df[field_name] = df[field_name].apply(lambda x: np.nan if x.size == 0 else x[0])   
+        df.rename(columns={'metPubChemID': 'pubchem_id', 
+                           'metHMDBID': 'hmdb_id',
+                           'metKEGGID' : 'kegg_id',
+                           'metCHEBIID':'chebi_id'}, inplace=True)
+
+        # df =      pd.read_csv(map4_path, sep=',', dtype=str)
 
         print(f'loaded metabolite mapping files')
 
@@ -126,6 +137,8 @@ class ReconAdapter:
         metabolite_to_gene.dropna(subset=['hmdb_id'], inplace=True)
         metabolite_to_gene['status'] = 'recon'
         metabolite_to_gene['uniprot'] = symbol_to_uniprot(metabolite_to_gene['gene_id'])
+        # fuse a 'uniprot:' uniprot columns
+        metabolite_to_gene['uniprot'] = metabolite_to_gene['uniprot'].apply(lambda x: 'uniprot:' + x if x is not np.nan else x)
         
 
         for row in tqdm(metabolite_to_gene.iterrows()):
@@ -267,8 +280,6 @@ def preprocess_metmaps(df, metmap1, metmap2, metmap3):
 
     # rename metmap3['accession'] to 'hmdb_id'
     metmap3.rename(columns={'accession': 'hmdb_id'}, inplace=True)
-    # remove protein accesion column from metmap3
-    metmap3.drop(columns=['protein_accession'], inplace=True)
     # add a 'CHEBI:' to the beginning of the strings in metmap3['chebi_id'] if they are not nan
     metmap3['chebi_id'] = metmap3['chebi_id'].apply(lambda x: 'CHEBI:' + x if not pd.isnull(x) else x)
 
@@ -344,3 +355,42 @@ def symbol_to_uniprot(ensp_list):
         else:
             gene_symbol_list.append('NA')
     return gene_symbol_list
+
+
+
+# solution to exclude local files ( very slow)
+
+# from pypath.inputs import hmdb
+# map_table = hmdb.hmdb_table('pubchem_compound_id', 'accession', 'kegg_id', 'chebi_id')
+# names = ['pubchem', 'hmdb', 'kegg', 'chebi']
+# map_table['chebi_id'] = map_table['chebi_id'].apply(lambda x: 'CHEBI:' + x if not pd.isnull(x) else x)
+
+# map_dict = {}
+# for i in range(4):
+#     for j in range(4):
+#         if i != j:
+#             map_dict[(i, j)] = dict(zip(map_table.iloc[:, i], map_table.iloc[:, j]))
+#             map_dict[names[i] + '_' + names[j]] = map_dict.pop((i, j))
+
+# for key in map_dict.keys():
+#     map_dict[key] = {k: v for k, v in map_dict[key].items() if k is not None and v is not None}
+
+# for i in names:
+#     names_remain = names.copy()
+#     names_remain.remove(i)
+#     for j in df[i]:
+#         if j is not np.nan:
+#             for k in names_remain:
+#                 if j in map_dict[i + '_' + k].keys():
+#                     df[k][df[i] == j] = map_dict[i + '_' + k][j]
+
+# # update map_dict to include the mapping from df
+# for i in names:
+#     for j in names:
+#         if i != j:
+#             update = dict(zip(df[i], df[j]))
+#             # remove all the NA values in key and value
+#             update = {k: v for k, v in update.items() if k is not np.nan and v is not np.nan}
+#             map_dict[i + '_' + j].update(update)
+
+
