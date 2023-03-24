@@ -38,7 +38,7 @@ protein:
 
 
 production degradation metabolite protein interaction:
-  is_a: chemical to gene association
+  is_a: association
   represented_as: edge
   source: small molecule
   target: protein
@@ -52,7 +52,7 @@ production degradation metabolite protein interaction:
 
 
 recon production degradation metabolite protein interaction:
-  is_a: chemical to gene association
+  is_a: association
   represented_as: edge
   source: small molecule
   target: protein
@@ -63,7 +63,7 @@ recon production degradation metabolite protein interaction:
 
 
 communication metabolite protein interaction:
-  is_a: chemical to gene association
+  is_a: association
   represented_as: edge
   source: small molecule
   target: protein

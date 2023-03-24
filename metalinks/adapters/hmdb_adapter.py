@@ -122,7 +122,7 @@ class HMDBAdapter:
             'chebi_id',
             'pubchem_compound_id', 
             'name',
-            head = 100
+            # head = 100
         )
 
         data = data[data['pubchem_compound_id'] != '']

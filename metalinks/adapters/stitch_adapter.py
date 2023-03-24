@@ -91,7 +91,7 @@ class STITCHAdapter:
         interactions = interactions.with_columns(pl.col('chemical').str.slice(4, None).cast(pl.Int64))
 
         # mapping
-        map_dict = hmdb.hmdb_mapping('pubchem_compound_id', 'accession', head = 10)
+        map_dict = hmdb.hmdb_mapping('pubchem_compound_id', 'accession')
         for k, v in map_dict.items():
             map_dict[k] = v.pop()
         interactions = interactions.with_columns(pl.col('chemical').cast(pl.Utf8).map_dict(map_dict).alias('metabolite'))
@@ -122,8 +122,8 @@ class STITCHAdapter:
             else:
                 continue
 
-            counter += 1
-            if counter > 100:
-                break
+            # counter += 1
+            # if counter > 100:
+            #     break
 
             yield row[9], row[8], uniprot, 'MR', attributes

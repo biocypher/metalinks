@@ -67,7 +67,7 @@ class ReconAdapter:
         recon_symbols_path = 'data/recon_gene_symbols.csv'
 
         map1_path = 'data/mapping_tables/global_ID_mapping_curated.tsv'
-        map2_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/data/mapping_tables/metmap_curated.csv'
+        map2_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/metmap_curated.csv'
         map3_path = 'data/mapping_tables/hmdb_mapping.csv'
         # map4_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/recon3D_anno_curated.csv'
 
