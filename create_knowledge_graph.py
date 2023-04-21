@@ -57,6 +57,10 @@ hmdb_node_fields = [
     HMDBMetaboliteNodeField.METABOLITE_PUBCHEM_ID,
     HMDBMetaboliteNodeField.METABOLITE_PROTEINS,
     HMDBMetaboliteNodeField.METABOLITE_PATHWAYS,
+    HMDBMetaboliteNodeField.METABOLITE_CELLULAR_LOCATIONS,
+    HMDBMetaboliteNodeField.METABOLITE_BIOSPECIMEN_LOCATIONS,
+    HMDBMetaboliteNodeField.METABOLITE_TISSUE_LOCATIONS,
+    HMDBMetaboliteNodeField.METABOLITE_DISEASES,
 ]
 
 uniprot_node_fields = [

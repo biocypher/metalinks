@@ -11,8 +11,12 @@ small molecule:
    kegg_id: KEGG
    chebi_id: int
    pubchem_compound_id: int
+   cellular_locations: str[]
+   biospecimen_locations: str[]
+   tissue_locations: str[]
+   pathways: str[]
+   diseases: str[]
   #  protein_accession: str{}
-  #  pathways: str{}
 
 protein:
   represented_as: node

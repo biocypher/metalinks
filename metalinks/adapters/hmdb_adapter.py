@@ -38,6 +38,13 @@ class HMDBMetaboliteNodeField(Enum):
     METABOLITE_PUBCHEM_ID   = "pubchemId"
     METABOLITE_PROTEINS     = "proteins"
     METABOLITE_PATHWAYS     = "pathways"
+    METABOLITE_CELLULAR_LOCATIONS = "cellular_locations"
+    METABOLITE_BIOSPECIMEN_LOCATIONS = "biospecimen_locations"
+    METABOLITE_TISSUE_LOCATIONS = "tissue_locations"
+    METABOLITE_DISEASES = "diseases"
+
+    
+
     
 
 
@@ -122,10 +129,19 @@ class HMDBAdapter:
             'chebi_id',
             'pubchem_compound_id', 
             'name',
+            'biological_properties',
+            'diseases',
             # head = 100
         )
 
         data = data[data['pubchem_compound_id'] != '']
+        data['cellular_locations'] = data['biological_properties'].apply(lambda x: x['cellular_locations'])
+        data['biospecimen_locations'] = data['biological_properties'].apply(lambda x: x['biospecimen_locations'])
+        data['tissue_locations'] = data['biological_properties'].apply(lambda x: x['tissue_locations'])
+        # extract pathways name information from pathways key in biological_properties column
+        data['pathways'] = data['biological_properties'].apply(lambda x: [pathway['name'] for pathway in x['pathways']])
+        data['diseases'] = data['diseases'].apply(lambda x: [disease['name'] for disease in x])
+
 
         for index in range(len(data)):
             attributes = data.iloc[index, 1:].to_dict()
