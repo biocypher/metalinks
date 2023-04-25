@@ -41,7 +41,7 @@ protein:
 #   is_a: enzymatic interaction
 
 
-production degradation metabolite protein interaction:
+hmdb production degradation:
   is_a: association
   represented_as: edge
   source: small molecule
@@ -55,7 +55,7 @@ production degradation metabolite protein interaction:
     # external_links: str
 
 
-recon production degradation metabolite protein interaction:
+recon production degradation:
   is_a: association
   represented_as: edge
   source: small molecule
@@ -64,9 +64,12 @@ recon production degradation metabolite protein interaction:
   properties:
     status: str
     direction: str
+    subsystem: str
+    transport: str
+    transport_direction: str
 
 
-communication metabolite protein interaction:
+stitch metabolite receptor:
   is_a: association
   represented_as: edge
   source: small molecule

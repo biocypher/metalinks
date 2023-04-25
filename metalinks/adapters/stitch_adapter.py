@@ -84,7 +84,7 @@ class STITCHAdapter:
         interactions = data.join(df, on=['chemical', 'protein'], how='left')
         del data
         del df
-        interactions = interactions.filter((pl.col('combined_score') > 700) & (pl.col('mode').is_not_null()) ) # change to lower cutoff later
+        interactions = interactions.filter((pl.col('combined_score') > 150) & (pl.col('mode').is_not_null()) ) # change to lower cutoff later
 
         #aesthetics
         interactions = interactions.with_columns(pl.col('protein').str.replace('9606.', ''))

@@ -41,6 +41,9 @@ class ReconMetaboliteToProteinEdgeField(Enum):
 
     DIRECTION = "direction"
     STATUS = "status"
+    SUBSYSTEM = "subsystem"
+    TRANSPORT = "transport"
+    TRANSPORT_DIRECTION = 'transport_direction'
 
 
 class ReconAdapter:
@@ -89,6 +92,8 @@ class ReconAdapter:
         lb_ub['ub'] = data['ub'][0][0]
         lb_ub['rev'] = lb_ub.apply(lambda x: 'reversible' if x['lb'] < 0 and x['ub'] > 0 else 'irreversible', axis=1)
         lb_ub['direction'] = lb_ub.apply(lambda x: 'forward' if x['ub'] > 0 else 'backward', axis=1)
+        subsystem = pd.DataFrame(data['subSystems'][0][0].flatten(), index=reaction_ids, columns=['subsystem'])
+        subsystem = [x[0][0][0] for x in subsystem['subsystem']]
 
 
         reaction_to_genes = get_gene_symbols(rxn_gene_df)
@@ -97,6 +102,35 @@ class ReconAdapter:
         reaction_to_metabolites_deg = get_metabolites(S, d = -1)
 
         metabolite_to_gene = get_metabolite_to_gene(reaction_to_metabolites_prod, reaction_to_metabolites_deg, reaction_to_genes, lb_ub)
+
+        ss_dict = dict(zip(reaction_ids, subsystem))
+        metabolite_to_gene['subsystem'] = metabolite_to_gene['reaction_id'].map(ss_dict)    
+        metabolite_to_gene['compartment'] = metabolite_to_gene['metabolite_id'].apply(lambda x: x.split('[')[1])
+        metabolite_to_gene['compartment'] = metabolite_to_gene['compartment'].apply(lambda x: x.split(']')[0])
+        metabolite_to_gene['subsystem'].value_counts()
+        metabolite_to_gene['transport'] = 'unknown'
+
+        # if compartment is c, the subsystem is 'Transport, Extracellular'then transport is 'e->c'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'c') & (metabolite_to_gene['subsystem'] == 'Transport, extracellular'), 'transport'] = 'c->e'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'e') & (metabolite_to_gene['subsystem'] == 'Transport, extracellular'), 'transport'] = 'e->c'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'm') & (metabolite_to_gene['subsystem'] == 'Transport, mitochondrial'), 'transport'] = 'm->c'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'c') & (metabolite_to_gene['subsystem'] == 'Transport, mitochondrial'), 'transport'] = 'c->m'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'r') & (metabolite_to_gene['subsystem'] == 'Transport, endoplasmic reticular'), 'transport'] = 'r->c'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'c') & (metabolite_to_gene['subsystem'] == 'Transport, endoplasmic reticular'), 'transport'] = 'c->r'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'l') & (metabolite_to_gene['subsystem'] == 'Transport, lysosomal'), 'transport'] = 'l->c'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'c') & (metabolite_to_gene['subsystem'] == 'Transport, lysosomal'), 'transport'] = 'c->l'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'x') & (metabolite_to_gene['subsystem'] == 'Transport, peroxisomal'), 'transport'] = 'x->c'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'c') & (metabolite_to_gene['subsystem'] == 'Transport, peroxisomal'), 'transport'] = 'c->x'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'g') & (metabolite_to_gene['subsystem'] == 'Transport, golgi apparatus'), 'transport'] = 'g->c'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'c') & (metabolite_to_gene['subsystem'] == 'Transport, golgi apparatus'), 'transport'] = 'c->g'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'n') & (metabolite_to_gene['subsystem'] == 'Transport, nuclear'), 'transport'] = 'n->c'
+        metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'c') & (metabolite_to_gene['subsystem'] == 'Transport, nuclear'), 'transport'] = 'c->n'
+
+        metabolite_to_gene['transport_direction'] = 'unknown'
+        metabolite_to_gene[metabolite_to_gene['subsystem'].str.contains('Transport')]['transport_direction'] = 'out'
+        metabolite_to_gene.loc[metabolite_to_gene['transport'].str.startswith('c'), 'transport_direction'] = 'in'
+        metabolite_to_gene.loc[metabolite_to_gene['transport'] == 'c->e', 'transport_direction'] = 'out'
+        metabolite_to_gene.loc[metabolite_to_gene['transport'] == 'e->c', 'transport_direction'] = 'in'
 
         print(f'collapsed metabolites to genes, now have {len(metabolite_to_gene)} metabolite to gene links')
 
@@ -107,9 +141,11 @@ class ReconAdapter:
         field_names = ['metPubChemID',  'metHMDBID', 'metKEGGID', 'metCHEBIID',  'mets']
 
         df = pd.DataFrame(columns=field_names)
+
         for field_name in field_names:
             df[field_name] = data[field_name][0][0].flatten()
             df[field_name] = df[field_name].apply(lambda x: np.nan if x.size == 0 else x[0])   
+
         df.rename(columns={'metPubChemID': 'pubchem_id', 
                            'metHMDBID': 'hmdb_id',
                            'metKEGGID' : 'kegg_id',
@@ -146,6 +182,9 @@ class ReconAdapter:
                 'status': row[1]['status'],
                 'direction': row[1]['direction'],
                 'symbol': row[1]['gene_id'],
+                'subsystem': row[1]['subsystem'],
+                'transport': row[1]['transport'],
+                'transport_direction': row[1]['transport_direction']
             }
             r = row[1].astype(str)
             h = hashlib.md5(''.join(r).encode('utf-8')).hexdigest()

@@ -4,6 +4,9 @@ import pstats
 import sys
 from biocypher import BioCypher
 sys.path.append("/home/efarr/Documents/BC/CROssBAR-BioCypher-Migration/bccb/")
+sys.path.append("/home/efarr/Documents/GitHub/liana/adapters/")
+
+import uniprot_adapter
 
 # set working directory
 import os
@@ -125,6 +128,9 @@ recon_edge_fields = [
     ReconMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
     ReconMetaboliteToProteinEdgeField.STATUS,
     ReconMetaboliteToProteinEdgeField.DIRECTION,
+    ReconMetaboliteToProteinEdgeField.SUBSYSTEM,
+    ReconMetaboliteToProteinEdgeField.TRANSPORT,
+    ReconMetaboliteToProteinEdgeField.TRANSPORT_DIRECTION,
 ]
 
 
@@ -159,14 +165,14 @@ def main():
         test_mode=True,
     )
 
-    uniprot_adapter = Uniprot(
+    UNIPROT = Uniprot(
             organism="9606",
             node_types=uniprot_node_types,
             node_fields=uniprot_node_fields,
             test_mode=True,
         )
     
-    uniprot_adapter.download_uniprot_data(
+    UNIPROT.download_uniprot_data(
         cache=True,
         retries=5,
     )
@@ -186,7 +192,7 @@ def main():
 
     # write nodes and edges to csv
     bc.write_nodes(HMDB.get_nodes())
-    bc.write_nodes(uniprot_adapter.get_nodes())
+    bc.write_nodes(UNIPROT.get_nodes())
     bc.write_edges(HMDB.get_edges())
     bc.write_edges(STITCH.get_edges())
     bc.write_edges(RECON.get_edges())
