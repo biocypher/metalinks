@@ -38,6 +38,12 @@ from metalinks.adapters.recon_adapter import (
     ReconMetaboliteToProteinEdgeField,
 )
 
+from metalinks.adapters.hmr_adapter import (
+    HmrAdapter,
+    HmrEdgeType,
+    HmrMetaboliteToProteinEdgeField,
+)
+
 
 import biocypher
 
@@ -97,6 +103,10 @@ recon_edge_types = [
     ReconEdgeType.PD,
 ]
 
+hmr_edge_types = [
+    HmrEdgeType.PD,
+]
+
 hmdb_edge_fields = [
     HMDBMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
     HMDBMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
@@ -131,6 +141,17 @@ recon_edge_fields = [
     ReconMetaboliteToProteinEdgeField.SUBSYSTEM,
     ReconMetaboliteToProteinEdgeField.TRANSPORT,
     ReconMetaboliteToProteinEdgeField.TRANSPORT_DIRECTION,
+]
+
+hmr_edge_fields = [
+    HmrMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
+    HmrMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
+    HmrMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
+    HmrMetaboliteToProteinEdgeField.STATUS,
+    HmrMetaboliteToProteinEdgeField.DIRECTION,
+    HmrMetaboliteToProteinEdgeField.SUBSYSTEM,
+    # HmrMetaboliteToProteinEdgeField.TRANSPORT,
+    # HmrMetaboliteToProteinEdgeField.TRANSPORT_DIRECTION,
 ]
 
 
@@ -190,12 +211,21 @@ def main():
         test_mode=True,
     )
 
+    HMR = HmrAdapter(
+        edge_types=hmr_edge_types,
+        edge_fields=hmr_edge_fields,
+        test_mode=True,
+    )
+
     # write nodes and edges to csv
+    bc.write_edges(STITCH.get_edges()) # high RAM, thus attention at the beginning
     bc.write_nodes(HMDB.get_nodes())
     bc.write_nodes(UNIPROT.get_nodes())
-    bc.write_edges(HMDB.get_edges())
-    bc.write_edges(STITCH.get_edges())
     bc.write_edges(RECON.get_edges())
+    bc.write_edges(HMR.get_edges())
+    bc.write_edges(HMDB.get_edges())
+
+ 
 
     # convenience and stats
     bc.write_import_call()

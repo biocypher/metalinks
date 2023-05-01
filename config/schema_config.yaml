@@ -68,6 +68,19 @@ recon production degradation:
     transport: str
     transport_direction: str
 
+hmr production degradation:
+  is_a: association
+  represented_as: edge
+  source: small molecule
+  target: protein
+  label_in_input: PD
+  properties:
+    status: str
+    direction: str
+    subsystem: str
+    # transport: str
+    # transport_direction: str
+
 
 stitch metabolite receptor:
   is_a: association
