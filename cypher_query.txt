@@ -1,0 +1,43 @@
+#Production degradation sets
+
+MATCH (m)-[a]->(p:Protein)
+WHERE type(a) in ['ReconProductionDegradation','HMDBProductionDegradation']  
+AND ANY(value in m.cellular_locations WHERE value = 'Extracellular') 
+AND (ANY(value in m.tissue_locations WHERE value in ['Kidney', 'All Tissues']) OR ANY(value in m.biospecimen_locations WHERE value = 'Urine')) 
+AND NOT (a.transport_direction = 'out' AND a.direction = 'degradation')
+RETURN m.id as HMDB,
+       m.name as MetName,
+       m.cellular_locations as CellLoc,
+       m.tissue_locations as TissueLoc,
+       m.biospecimen_locations as BiospecLoc,
+       a.transport_direction as Transport_direction,
+       a.mode as Mode,
+       a.direction as Direction,
+       a.status as Status,
+       p.id as Uniprot,
+       p.protein_names as ProtName
+
+
+#Metabolite receptor links
+
+MATCH (m)-[a]->(p:Protein)
+WHERE (a.database > 500 OR a.experiment > 500 OR a.combined_score > 900) 
+AND type(a) = 'StitchMetaboliteReceptor' 
+AND ANY(value in m.cellular_locations WHERE value = 'Extracellular') 
+AND (ANY(value in m.tissue_locations WHERE value in ['Kidney', 'All Tissues']) OR ANY(value in m.biospecimen_locations WHERE value = 'Urine'))
+RETURN m.id as HMDB,
+       m.name as MetName,
+       m.cellular_locations as CellLoc,
+       m.tissue_locations as TissueLoc,
+       m.biospecimen_locations as BiospecLoc,
+       a.mode as Mode,
+       a.direction as Direction,
+       a.status as Status,
+       p.id as Uniprot,
+       p.protein_names as ProtName
+
+
+
+
+
+
