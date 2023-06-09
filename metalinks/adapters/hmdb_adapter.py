@@ -42,24 +42,28 @@ class HMDBMetaboliteNodeField(Enum):
     METABOLITE_BIOSPECIMEN_LOCATIONS = "biospecimen_locations"
     METABOLITE_TISSUE_LOCATIONS = "tissue_locations"
     METABOLITE_DISEASES = "diseases"
+    METABOLITE_KINGDOM = "kingdom"
+    METABOLITE_CLASS = "class"
+    METABOLITE_SUB_CLASS = "sub_class"
+    METABOLITE_MOLECULAR_FRAMEWORK = "molecular_framework"
 
     
 
     
 
 
-class HMDBProteinNodeField(Enum):
-    """
-    Fields available for DepMap compounds.
-    """
+# class HMDBProteinNodeField(Enum):
+#     """
+#     Fields available for DepMap compounds.
+#     """
 
-    PROTEIN_ID = "uniprot"
-    _PRIMARY_ID = PROTEIN_ID
+#     PROTEIN_ID = "uniprot"
+#     _PRIMARY_ID = PROTEIN_ID
 
-    PROTEIN_SYMBOL = "symbol"
-    PROTEIN_HMDBP_ID = "hmdbp_id"
-    PROTEIN_PATHWAYS = "pathways"
-    PROTEIN_METABOLITES = "metabolites"
+#     PROTEIN_SYMBOL = "symbol"
+#     PROTEIN_HMDBP_ID = "hmdbp_id"
+#     PROTEIN_PATHWAYS = "pathways"
+#     PROTEIN_METABOLITES = "metabolites"
 
 
 
@@ -131,7 +135,8 @@ class HMDBAdapter:
             'name',
             'biological_properties',
             'diseases',
-            # head = 100
+            'taxonomy',
+            #  head = 100
         )
 
         data = data[data['pubchem_compound_id'] != '']
@@ -141,6 +146,11 @@ class HMDBAdapter:
         # extract pathways name information from pathways key in biological_properties column
         data['pathways'] = data['biological_properties'].apply(lambda x: [pathway['name'] for pathway in x['pathways']])
         data['diseases'] = data['diseases'].apply(lambda x: [disease['name'] for disease in x])
+        data['kingdom'] = data['taxonomy'].apply(lambda x: x['kingdom'])
+        data['class'] = data['taxonomy'].apply(lambda x: x['class'])
+        data['sub_class'] = data['taxonomy'].apply(lambda x: x['sub_class'])
+        data['molecular_framework'] = data['taxonomy'].apply(lambda x: x['molecular_framework'])
+        
 
 
         for index in range(len(data)):

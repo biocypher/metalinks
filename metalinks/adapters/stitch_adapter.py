@@ -97,6 +97,22 @@ class STITCHAdapter:
         interactions = interactions.with_columns(pl.col('chemical').cast(pl.Utf8).map_dict(map_dict).alias('metabolite'))
         interactions = interactions.filter(pl.col('metabolite').is_not_null())
 
+        order = {
+            'activation': 1,
+            'inhibition': 2,
+            'binding': 3,
+            'pred_bind': 4,
+            'reaction': 5,
+            'expression': 6,
+            'catalysis': 7
+        }
+
+        # Assuming `df` is your DataFrame
+        interactions = interactions.with_column(pl.col("mode").apply(lambda x: order[x], return_dtype=pl.Int32).alias("mode_order"))
+
+        # Now, sort the DataFrame based on the new column and then drop it
+        interactions = interactions.sort("mode_order").drop("mode_order")       
+
         # add as hash per reaction
         reaction_id  = interactions.hash_rows(seed=42) # change to md5 later
         interactions = interactions.with_columns(reaction_id)

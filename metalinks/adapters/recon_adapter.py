@@ -44,6 +44,7 @@ class ReconMetaboliteToProteinEdgeField(Enum):
     SUBSYSTEM = "subsystem"
     TRANSPORT = "transport"
     TRANSPORT_DIRECTION = 'transport_direction'
+    REV = 'rev'
 
 
 class ReconAdapter:
@@ -184,23 +185,13 @@ class ReconAdapter:
                 'symbol': row[1]['gene_id'],
                 'subsystem': row[1]['subsystem'],
                 'transport': row[1]['transport'],
-                'transport_direction': row[1]['transport_direction']
+                'transport_direction': row[1]['transport_direction'],
+                'rev': row[1]['rev'],
             }
             r = row[1].astype(str)
             h = hashlib.md5(''.join(r).encode('utf-8')).hexdigest()
             yield h, row[1]['hmdb_id'], row[1]['uniprot'], 'PD', attributes
 
-
-
-def get_metabolites(S):
-    S = S.copy()
-    S[S != 0] = 1
-    S = S.stack().reset_index()
-    S.columns = ['metabolite_id', 'reaction_id', 'value']
-    S = S[S['value'] == 1]
-    S = S.drop('value', axis=1)
-    S.drop_duplicates(inplace=True)
-    return S
 
 def get_gene_symbols(rxn_gene_df):
     row_sums = rxn_gene_df.sum(axis=1)
@@ -235,6 +226,7 @@ def get_metabolite_to_gene(reaction_to_metabolites_prod, reaction_to_metabolites
     rev_df = metabolite_to_gene[metabolite_to_gene['reaction_id'].isin(reversible_reactions)]
     rev_df['direction'] = rev_df['direction'].apply(lambda x: 'degrading' if x == 'producing' else 'producing')
     metabolite_to_gene = pd.concat([metabolite_to_gene, rev_df])
+    metabolite_to_gene['rev'] = metabolite_to_gene['reaction_id'].apply(lambda x: 'reversible' if x in reversible_reactions else 'irreversible')
     return metabolite_to_gene
 
 

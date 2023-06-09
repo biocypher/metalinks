@@ -3,10 +3,6 @@ import io
 import pstats
 import sys
 from biocypher import BioCypher
-sys.path.append("/home/efarr/Documents/BC/CROssBAR-BioCypher-Migration/bccb/")
-sys.path.append("/home/efarr/Documents/GitHub/liana/adapters/")
-
-import uniprot_adapter
 
 # set working directory
 import os
@@ -26,7 +22,7 @@ from metalinks.adapters.stitch_adapter import (
     STITCHMetaboliteToProteinEdgeField,
 )
 
-from uniprot_adapter import (
+from metalinks.adapters.uniprot_metalinks import (
     Uniprot,
     UniprotNodeType,
     UniprotNodeField,
@@ -56,6 +52,7 @@ hmdb_node_types = [
 
 uniprot_node_types = [
     UniprotNodeType.PROTEIN,
+    #UniprotNodeType.CELLULAR_COMPARTMENT        ,
 ]
 
 hmdb_node_fields = [
@@ -70,6 +67,10 @@ hmdb_node_fields = [
     HMDBMetaboliteNodeField.METABOLITE_BIOSPECIMEN_LOCATIONS,
     HMDBMetaboliteNodeField.METABOLITE_TISSUE_LOCATIONS,
     HMDBMetaboliteNodeField.METABOLITE_DISEASES,
+    HMDBMetaboliteNodeField.METABOLITE_KINGDOM,
+    HMDBMetaboliteNodeField.METABOLITE_CLASS,
+    HMDBMetaboliteNodeField.METABOLITE_SUB_CLASS,
+    HMDBMetaboliteNodeField.METABOLITE_MOLECULAR_FRAMEWORK,
 ]
 
 uniprot_node_fields = [
@@ -87,6 +88,8 @@ uniprot_node_fields = [
     UniprotNodeField.PROTEIN_ENTREZ_GENE_IDS,
     UniprotNodeField.PROTEIN_VIRUS_HOSTS,
     UniprotNodeField.PROTEIN_KEGG_IDS,
+    UniprotNodeField.PROTEIN_SYMBOL,
+    #UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION,
 
 ]
 
@@ -141,6 +144,7 @@ recon_edge_fields = [
     ReconMetaboliteToProteinEdgeField.SUBSYSTEM,
     ReconMetaboliteToProteinEdgeField.TRANSPORT,
     ReconMetaboliteToProteinEdgeField.TRANSPORT_DIRECTION,
+    ReconMetaboliteToProteinEdgeField.REV
 ]
 
 hmr_edge_fields = [
@@ -150,8 +154,9 @@ hmr_edge_fields = [
     HmrMetaboliteToProteinEdgeField.STATUS,
     HmrMetaboliteToProteinEdgeField.DIRECTION,
     HmrMetaboliteToProteinEdgeField.SUBSYSTEM,
-    # HmrMetaboliteToProteinEdgeField.TRANSPORT,
-    # HmrMetaboliteToProteinEdgeField.TRANSPORT_DIRECTION,
+    HmrMetaboliteToProteinEdgeField.TRANSPORT,
+    HmrMetaboliteToProteinEdgeField.TRANSPORT_DIRECTION,
+    HmrMetaboliteToProteinEdgeField.REV
 ]
 
 
