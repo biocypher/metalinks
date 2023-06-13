@@ -128,7 +128,7 @@ class ReconAdapter:
         metabolite_to_gene.loc[(metabolite_to_gene['compartment'] == 'c') & (metabolite_to_gene['subsystem'] == 'Transport, nuclear'), 'transport'] = 'c->n'
 
         metabolite_to_gene['transport_direction'] = 'unknown'
-        metabolite_to_gene[metabolite_to_gene['subsystem'].str.contains('Transport')]['transport_direction'] = 'out'
+        metabolite_to_gene.loc[metabolite_to_gene['subsystem'].str.contains('Transport'), 'transport_direction'] = 'out'
         metabolite_to_gene.loc[metabolite_to_gene['transport'].str.startswith('c'), 'transport_direction'] = 'in'
         metabolite_to_gene.loc[metabolite_to_gene['transport'] == 'c->e', 'transport_direction'] = 'out'
         metabolite_to_gene.loc[metabolite_to_gene['transport'] == 'e->c', 'transport_direction'] = 'in'

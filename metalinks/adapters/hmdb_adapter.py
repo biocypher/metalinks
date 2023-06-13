@@ -93,6 +93,7 @@ class HMDBMetaboliteToProteinEdgeField(Enum):
     DIRECTION = "direction"
     MET_NAME = "met_name"
     STATUS = "status"
+    SUBSYSTEM = "subsystem"
 
 
 
@@ -184,10 +185,18 @@ class HMDBAdapter:
         reactions = read_csv(reactions_path, sep=',')
         reactions['HMDBP'] = reactions['HMDBP'].apply(lambda x: id_conversion[x] if x in id_conversion else None)
         reactions.rename(columns={'HMDBP': 'uniprot'}, inplace=True)
+
+        tdb = read_csv('/home/efarr/Documents/metalinks/Data/Source/Other_DBs/TransportDB2.0_translated.tsv', sep='\t')
+        reactions['subsystem'] = 'unknown'
+        reactions['subsystem'][reactions['uniprot'].isin(tdb['Entry'])] = 'Transport'
+
+
         reactions['uniprot'] = reactions['uniprot'].apply(lambda x: 'uniprot:' + x if x is not None else None)
         reactions['reaction_id'] = reactions.apply(lambda x: hashlib.md5(str(x).encode('utf-8')).hexdigest(), axis=1)
         reactions = reactions[['reaction_id'] + [col for col in reactions.columns if col != 'reaction_id']]
 
+        
+        
         
         for index in range(len(reactions)):
             attributes = reactions.iloc[index, 3:].to_dict()

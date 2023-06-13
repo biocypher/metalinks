@@ -118,6 +118,7 @@ hmdb_edge_fields = [
     HMDBMetaboliteToProteinEdgeField.DIRECTION,
     HMDBMetaboliteToProteinEdgeField.MET_NAME,
     HMDBMetaboliteToProteinEdgeField.STATUS,
+    HMDBMetaboliteToProteinEdgeField.SUBSYSTEM,
 
 ]
 

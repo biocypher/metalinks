@@ -59,6 +59,7 @@ hmdb production degradation:
     direction: str
     status: str
     reaction_id: int
+    subsystem: str
     # external_links: str
 
 
