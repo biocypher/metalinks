@@ -89,6 +89,7 @@ uniprot_node_fields = [
     UniprotNodeField.PROTEIN_VIRUS_HOSTS,
     UniprotNodeField.PROTEIN_KEGG_IDS,
     UniprotNodeField.PROTEIN_SYMBOL,
+    UniprotNodeField.PROTEIN_RECEPTOR_TYPE,
     #UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION,
 
 ]
@@ -187,8 +188,8 @@ def main():
     HMDB = HMDBAdapter(
         node_types=hmdb_node_types,
         node_fields=hmdb_node_fields,
-        edge_types=hmdb_edge_types,
-        edge_fields=hmdb_edge_fields,
+        # edge_types=hmdb_edge_types,
+        # edge_fields=hmdb_edge_fields,
         test_mode=True,
     )
 

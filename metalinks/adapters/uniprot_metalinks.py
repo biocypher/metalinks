@@ -5,6 +5,7 @@ import collections
 from typing import Dict, List, Optional
 from enum import Enum, auto
 from functools import lru_cache
+from pandas import read_csv
 
 from tqdm import tqdm  # progress bar
 from pypath.share import curl, settings
@@ -52,6 +53,7 @@ class UniprotNodeField(Enum):
     PROTEIN_VIRUS_HOSTS = "virus hosts"
     PROTEIN_KEGG_IDS = "database(KEGG)"
     PROTEIN_SYMBOL = "symbol"
+    PROTEIN_RECEPTOR_TYPE = "receptor_type"
     PROTEIN_SUBCELLULAR_LOCATION = "subcellular_location" 
 
 
@@ -184,7 +186,9 @@ class Uniprot:
         self.data = {}
         for query_key in tqdm(self.node_fields):
 
-            if query_key != UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION.value:
+            if query_key == UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value:
+                continue
+            elif query_key != UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION.value:
                 self.data[query_key] = uniprot.uniprot_data(
                     query_key, self.organism, self.rev
                 )
@@ -236,7 +240,7 @@ class Uniprot:
         for arg in tqdm(self.node_fields):
 
             # do not process ensembl gene ids (we will get them from pypath)
-            if arg == UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value:
+            if arg in [UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value, UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value]:
                 pass
 
             # Integers
@@ -330,6 +334,9 @@ class Uniprot:
             f"{[type.name for type in self.node_types]}."
         )
 
+        GtP = read_csv('/home/efarr/Documents/GitHub/metalinks-biocypher/data/targets_and_families.csv', sep=',', skiprows=1)
+        target_dict = dict(zip(GtP['Human SwissProt'], GtP['Type']))
+
         for uniprot_entity in self._reformat_and_filter_proteins():
 
             protein_id, all_props = uniprot_entity
@@ -338,6 +345,12 @@ class Uniprot:
 
             symbol = mapping.map_name(protein_id.split(':')[1], "uniprot", "genesymbol")
 
+            receptor_type = target_dict.get(protein_id.split(':')[1])
+
+            if receptor_type:
+                protein_props[UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value] = receptor_type
+            else:
+                protein_props[UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value] = 'NA'
             if symbol:
                 protein_props[UniprotNodeField.PROTEIN_SYMBOL.value] = symbol.pop()
             else:
@@ -505,7 +518,9 @@ class Uniprot:
 
             for arg in self.node_fields:
 
-                _props[arg] = self.data.get(arg).get(protein)
+                if arg != UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value:
+
+                    _props[arg] = self.data.get(arg).get(protein)
 
             yield protein_id, _props
 
@@ -547,7 +562,7 @@ class Uniprot:
         for k in all_props.keys():
 
             if k not in self.gene_properties:
-                continue
+                pass
 
             if "(" in k:
                 k_new = k.split("(")[1].split(")")[0].lower()
