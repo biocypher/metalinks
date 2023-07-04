@@ -107,3 +107,22 @@ stitch metabolite receptor:
       textmining: int
       combined_score: int
 
+cellphone metabolite receptor:
+  is_a: association
+  represented_as: edge
+  source: small molecule
+  target: protein
+  label_in_input: CP
+  properties:
+      mode: str
+
+neuronchat metabolite receptor:
+  is_a: association
+  represented_as: edge
+  source: small molecule
+  target: protein
+  label_in_input: NC
+  properties:
+      mode: str
+
+

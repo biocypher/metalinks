@@ -40,6 +40,18 @@ from metalinks.adapters.hmr_adapter import (
     HmrMetaboliteToProteinEdgeField,
 )
 
+from metalinks.adapters.cellphone_metabolites_adapter import (
+    CellphoneAdapter,
+    CellphoneEdgeType,
+    CellphoneMetaboliteToProteinEdgeField,
+)
+
+
+from metalinks.adapters.neuronchat_adapter import (
+    NeuronchatAdapter,
+    NeuronchatEdgeType,
+    NeuronchatMetaboliteToProteinEdgeField,
+)
 
 import biocypher
 
@@ -111,6 +123,15 @@ hmr_edge_types = [
     HmrEdgeType.PD,
 ]
 
+cellphone_edge_types = [
+    CellphoneEdgeType.CP,
+]
+
+neuronchat_edge_types = [
+    NeuronchatEdgeType.NC,
+]
+
+
 hmdb_edge_fields = [
     HMDBMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
     HMDBMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
@@ -159,6 +180,20 @@ hmr_edge_fields = [
     HmrMetaboliteToProteinEdgeField.TRANSPORT,
     HmrMetaboliteToProteinEdgeField.TRANSPORT_DIRECTION,
     HmrMetaboliteToProteinEdgeField.REV
+]
+
+cellphone_edge_fields = [
+    CellphoneMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
+    CellphoneMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
+    CellphoneMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
+    CellphoneMetaboliteToProteinEdgeField.MODE
+]
+
+neuronchat_edge_fields = [
+    NeuronchatMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
+    NeuronchatMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
+    NeuronchatMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
+    NeuronchatMetaboliteToProteinEdgeField.MODE
 ]
 
 
@@ -224,7 +259,21 @@ def main():
         test_mode=True,
     )
 
+    CELLPHONE = CellphoneAdapter(
+        edge_types=cellphone_edge_types,
+        edge_fields=cellphone_edge_fields,
+        test_mode=True,
+    )
+
+    NEURONCHAT = NeuronchatAdapter(
+        edge_types=neuronchat_edge_types,
+        edge_fields=neuronchat_edge_fields,
+        test_mode=True,
+    )
+
     # write nodes and edges to csv
+    bc.write_edges(CELLPHONE.get_edges())
+    bc.write_edges(NEURONCHAT.get_edges())
     bc.write_edges(STITCH.get_edges()) # high RAM, thus attention at the beginning
     bc.write_nodes(HMDB.get_nodes())
     bc.write_nodes(UNIPROT.get_nodes())

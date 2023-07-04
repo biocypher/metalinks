@@ -10,7 +10,6 @@ from typing import Optional
 import pandas as pd
 import numpy as np
 import hashlib
-from pypath.utils import mapping
 from tqdm import tqdm
 import numpy as np
 import scipy.io as sio
