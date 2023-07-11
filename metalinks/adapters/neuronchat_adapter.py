@@ -58,8 +58,8 @@ class NeuronchatAdapter:
         """
         Get edges from Neuronchat (curated file)
         """
-        neuronchat_path = '/home/efarr/Documents/metalinks/Data/Source/Other_DBs/NeuronChatDB_human.csv'
-        neuronchat_table_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/Neuronchat_table.csv'
+        neuronchat_path = 'data/NeuronChatDB_human.csv'
+        neuronchat_table_path = 'data/mapping_tables/Neuronchat_table.csv'
 
         ncdb                = pd.read_csv(neuronchat_table_path, sep=',')
 

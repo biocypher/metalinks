@@ -59,7 +59,7 @@ class CellphoneAdapter:
         Get edges from Cellphone (curated file)
         """
 
-        cpdb = pd.read_excel('/home/efarr/Documents/metalinks/Data/Source/Other_DBs/Cellphone_suptab4_curated.xlsx')
+        cpdb = pd.read_excel('data/Cellphone_suptab4_curated.xlsx')
         cpdb['symbol'] = cpdb['protein_name_b'].str.split('_').str[0]
         cpdb['uniprot'] = cpdb['symbol'].apply(lambda x: mapping.map_name(x, 'genesymbol', 'uniprot'))
 

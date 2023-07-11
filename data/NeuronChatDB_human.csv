@@ -1,0 +1,128 @@
+,interaction_name,ligand_type,interaction_type,lig_contributor,lig_contributor_group,lig_contributor_coeff,target_subunit,target_subunit_group,target_subunit_coeff
+37,Glu_GRIN1,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+38,Glu_GRIN2A,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+39,Glu_GRIN2B,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+40,Glu_GRIN2C,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+41,Glu_GRIN2D,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+42,Glu_GRIN3A,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+43,Glu_GRIN3B,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+44,Glu_GRIA1,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+45,Glu_GRIA2,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+46,Glu_GRIA3,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+47,Glu_GRIA4,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+48,Glu_GRIK1,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+49,Glu_GRIK2,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+50,Glu_GRIK3,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+51,Glu_GRIK4,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+52,Glu_GRIK5,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+53,Glu_GRM1,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+54,Glu_GRM5,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+55,Glu_GRM4,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+56,Glu_GRM6,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+57,Glu_GRM7,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+58,Glu_GRM8,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+59,Glu_GRM2,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+60,Glu_GRM3,Neurotransmitter,ligand-receptor,GLS-SLC17A6-SLC17A7-SLC17A8,1-2-2-2,1-1,,1,1
+64,GABA_GABRA1,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+65,GABA_GABRA2,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+66,GABA_GABRA3,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+67,GABA_GABRA4,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+68,GABA_GABRA5,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+69,GABA_GABRA6,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+70,GABA_GABRB1,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+71,GABA_GABRB2,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+72,GABA_GABRB3,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+73,GABA_GABRG1,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+74,GABA_GABRG2,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+75,GABA_GABRG3,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+76,GABA_GABBR1,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+77,GABA_GABBR2,Neurotransmitter,ligand-receptor,GAD1-GAD2-SLC32A1,1-1-2,1-1,,1,1
+97,Ach_CHRNA1,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+98,Ach_CHRNA2,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+99,Ach_CHRNA3,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+100,Ach_CHRNA4,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+101,Ach_CHRNA5,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+102,Ach_CHRNA6,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+103,Ach_CHRNA7,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+104,Ach_CHRNA9,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+105,Ach_CHRNA10,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+106,Ach_CHRNB1,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+107,Ach_CHRNB2,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+108,Ach_CHRNB3,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+109,Ach_CHRNB4,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+110,Ach_CHRND,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+111,Ach_CHRNE,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+112,Ach_CHRNG,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+113,Ach_CHRM1,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+114,Ach_CHRM2,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+115,Ach_CHRM3,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+116,Ach_CHRM4,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+117,Ach_CHRM5,Neurotransmitter,ligand-receptor,CHAT-SLC18A3,1-2,1-1,,1,1
+118,Ach_ACHE,Neurotransmitter,ligand degradation,CHAT-SLC18A3,1-2,1-1,,1,1
+119,Gly_GLRA1,Neurotransmitter,ligand-receptor,SHMT1-SHMT2-SLC32A1,1-1-2,1-1,,1,1
+120,Gly_GLRA2,Neurotransmitter,ligand-receptor,SHMT1-SHMT2-SLC32A1,1-1-2,1-1,,1,1
+121,Gly_GLRA3,Neurotransmitter,ligand-receptor,SHMT1-SHMT2-SLC32A1,1-1-2,1-1,,1,1
+122,Gly_GLRA4,Neurotransmitter,ligand-receptor,SHMT1-SHMT2-SLC32A1,1-1-2,1-1,,1,1
+123,Gly_GLRB,Neurotransmitter,ligand-receptor,SHMT1-SHMT2-SLC32A1,1-1-2,1-1,,1,1
+124,Gly_SLC6A9,Neurotransmitter,ligand uptake,SHMT1-SHMT2-SLC32A1,1-1-2,1-1,,1,1
+125,Gly_SLC6A5,Neurotransmitter,ligand uptake,SHMT1-SHMT2-SLC32A1,1-1-2,1-1,,1,1
+126,Serotonin_HTR1A,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+127,Serotonin_HTR1B,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+128,Serotonin_HTR1D,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+129,Serotonin_HTR1E,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+130,Serotonin_HTR1F,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+131,Serotonin_HTR2A,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+132,Serotonin_HTR2B,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+133,Serotonin_HTR2C,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+134,Serotonin_HTR3A,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+135,Serotonin_HTR3B,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+136,Serotonin_HTR3C,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+137,Serotonin_HTR3D,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+138,Serotonin_HTR3E,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+139,Serotonin_HTR4,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+140,Serotonin_HTR5A,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+141,Serotonin_HTR6,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+142,Serotonin_HTR7,Neurotransmitter,ligand-receptor,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+143,Serotonin_SLC6A4,Neurotransmitter,ligand uptake,TPH1-TPH2-DDC-SLC18A1-SLC18A2,1-1-2-3-3,1-1-1,,1,1
+144,Adrenaline_DRD1,Neurotransmitter,ligand-receptor,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+145,Adrenaline_DRD5,Neurotransmitter,ligand-receptor,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+146,Adrenaline_DRD2,Neurotransmitter,ligand-receptor,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+147,Adrenaline_DRD3,Neurotransmitter,ligand-receptor,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+148,Adrenaline_DRD4,Neurotransmitter,ligand-receptor,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+149,Adrenaline_SLC6A3,Neurotransmitter,ligand uptake,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+150,Adrenaline_COMT,Neurotransmitter,ligand degradation,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+144,Dopamine_DRD1,Neurotransmitter,ligand-receptor,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+145,Dopamine_DRD5,Neurotransmitter,ligand-receptor,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+146,Dopamine_DRD2,Neurotransmitter,ligand-receptor,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+147,Dopamine_DRD3,Neurotransmitter,ligand-receptor,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+148,Dopamine_DRD4,Neurotransmitter,ligand-receptor,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+149,Dopamine_SLC6A3,Neurotransmitter,ligand uptake,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+150,Dopamine_COMT,Neurotransmitter,ligand degradation,TH-DDC-SLC18A1-SLC18A2,1-2-3-3,1-1-1,,1,1
+151,Epinephrine_ADRA1A,Neurotransmitter,ligand-receptor,TH-DDC-DBH-PNMT-SLC18A1-SLC18A2,1-2-3-4-5-5,1-1-1-1-1,,1,1
+152,Epinephrine_ADRA1B,Neurotransmitter,ligand-receptor,TH-DDC-DBH-PNMT-SLC18A1-SLC18A2,1-2-3-4-5-5,1-1-1-1-1,,1,1
+153,Epinephrine_ADRA1D,Neurotransmitter,ligand-receptor,TH-DDC-DBH-PNMT-SLC18A1-SLC18A2,1-2-3-4-5-5,1-1-1-1-1,,1,1
+154,Epinephrine_ADRA2A,Neurotransmitter,ligand-receptor,TH-DDC-DBH-PNMT-SLC18A1-SLC18A2,1-2-3-4-5-5,1-1-1-1-1,,1,1
+155,Epinephrine_ADRA2B,Neurotransmitter,ligand-receptor,TH-DDC-DBH-PNMT-SLC18A1-SLC18A2,1-2-3-4-5-5,1-1-1-1-1,,1,1
+156,Epinephrine_ADRA2C,Neurotransmitter,ligand-receptor,TH-DDC-DBH-PNMT-SLC18A1-SLC18A2,1-2-3-4-5-5,1-1-1-1-1,,1,1
+157,Epinephrine_ADRB1,Neurotransmitter,ligand-receptor,TH-DDC-DBH-PNMT-SLC18A1-SLC18A2,1-2-3-4-5-5,1-1-1-1-1,,1,1
+158,Epinephrine_ADRB2,Neurotransmitter,ligand-receptor,TH-DDC-DBH-PNMT-SLC18A1-SLC18A2,1-2-3-4-5-5,1-1-1-1-1,,1,1
+159,Epinephrine_ADRB3,Neurotransmitter,ligand-receptor,TH-DDC-DBH-PNMT-SLC18A1-SLC18A2,1-2-3-4-5-5,1-1-1-1-1,,1,1
+160,Norepinephrine_ADRA1A,Neurotransmitter,ligand-receptor,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+161,Norepinephrine_ADRA1B,Neurotransmitter,ligand-receptor,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+162,Norepinephrine_ADRA1D,Neurotransmitter,ligand-receptor,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+163,Norepinephrine_ADRA2A,Neurotransmitter,ligand-receptor,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+164,Norepinephrine_ADRA2B,Neurotransmitter,ligand-receptor,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+165,Norepinephrine_ADRA2C,Neurotransmitter,ligand-receptor,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+166,Norepinephrine_ADRB1,Neurotransmitter,ligand-receptor,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+167,Norepinephrine_ADRB2,Neurotransmitter,ligand-receptor,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+168,Norepinephrine_ADRB3,Neurotransmitter,ligand-receptor,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+169,Norepinephrine_SLC6A2,Neurotransmitter,ligand uptake,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+170,Norepinephrine_COMT,Neurotransmitter,ligand degradation,TH-DDC-DBH-SLC18A1-SLC18A2,1-2-3-4-4,1-1-1-1,,1,1
+171,carbon monoxide_GUCY1B1,Gas,gas-effector,HMOX1-HMOX2,1-1,1,,1,1
+172,carbon monoxide_GUCY1B2,Gas,gas-effector,HMOX1-HMOX2,1-1,1,,1,1
+173,carbon monoxide_GUCY1A1,Gas,gas-effector,HMOX1-HMOX2,1-1,1,,1,1
+174,carbon monoxide_GUCY1A2,Gas,gas-effector,HMOX1-HMOX2,1-1,1,,1,1
+175,NO_GUCY1B1,Gas,gas-effector,NOS1-NOS2-NOS3,1-1-1,1,,1,1
+176,NO_GUCY1B2,Gas,gas-effector,NOS1-NOS2-NOS3,1-1-1,1,,1,1
+177,NO_GUCY1A1,Gas,gas-effector,NOS1-NOS2-NOS3,1-1-1,1,,1,1
+178,NO_GUCY1A2,Gas,gas-effector,NOS1-NOS2-NOS3,1-1-1,1,,1,1

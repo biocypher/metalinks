@@ -67,11 +67,11 @@ class HmrAdapter:
         Get edges from HMR.
         """
 
-        hmr = sio.loadmat('/home/efarr/Documents/metalinks/Data/Source/HMR/Human-GEM.mat')
+        hmr = sio.loadmat('data/HMR/Human-GEM.mat')
         hmr = hmr['ihuman']
-        genes = pd.read_csv('/home/efarr/Documents/metalinks/Data/Source/HMR/genes.tsv', sep='\t', index_col=0)
-        reactions = pd.read_csv('/home/efarr/Documents/metalinks/Data/Source/HMR/reactions.tsv', sep='\t', index_col=0)
-        metabolites = pd.read_csv('/home/efarr/Documents/metalinks/Data/Source/HMR/metabolites.tsv', sep='\t', index_col=0)
+        genes = pd.read_csv('data/HMR/genes.tsv', sep='\t', index_col=0)
+        reactions = pd.read_csv('data/HMR/reactions.tsv', sep='\t', index_col=0)
+        metabolites = pd.read_csv('data/metabolites.tsv', sep='\t', index_col=0)
 
         data = hmr
 

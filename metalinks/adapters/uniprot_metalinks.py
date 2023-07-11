@@ -334,7 +334,7 @@ class Uniprot:
             f"{[type.name for type in self.node_types]}."
         )
 
-        GtP = read_csv('/home/efarr/Documents/GitHub/metalinks-biocypher/data/targets_and_families.csv', sep=',', skiprows=1)
+        GtP = read_csv('data/targets_and_families.csv', sep=',', skiprows=1)
         target_dict = dict(zip(GtP['Human SwissProt'], GtP['Type']))
 
         for uniprot_entity in self._reformat_and_filter_proteins():

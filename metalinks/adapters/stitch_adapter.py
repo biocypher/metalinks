@@ -65,7 +65,7 @@ class STITCHAdapter:
         print( 'Getting MR connections from STITCH... ')
               
         # prepare stitch data
-        details_path = '/home/efarr/Documents/metalinks/Data/Source/Stitch/9606.protein_chemical.links.detailed.v5.0.tsv'
+        details_path = '/home/efarr/Documents/metalinks/Data/Source/Stitch/9606.protein_chemical.links.detailed.v5.0.tsv' # can be dowloaded at the stitch website: http://stitch.embl.de/cgi/download.pl?UserId=n5QdzJfmvzSj&sessionId=5nq4BYfHQNmU
         actions_path = '/home/efarr/Documents/metalinks/Data/Source/Stitch/9606.actions.v5.0.tsv'
 
         actions = pl.scan_csv(actions_path, sep='\t')

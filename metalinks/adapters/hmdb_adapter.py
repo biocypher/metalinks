@@ -186,7 +186,7 @@ class HMDBAdapter:
         reactions['HMDBP'] = reactions['HMDBP'].apply(lambda x: id_conversion[x] if x in id_conversion else None)
         reactions.rename(columns={'HMDBP': 'uniprot'}, inplace=True)
 
-        tdb = read_csv('/home/efarr/Documents/metalinks/Data/Source/Other_DBs/TransportDB2.0_translated.tsv', sep='\t')
+        tdb = read_csv('data/TransportDB2.0_translated.tsv', sep='\t')
         reactions['subsystem'] = 'unknown'
         reactions['subsystem'][reactions['uniprot'].isin(tdb['Entry'])] = 'Transport'
 
