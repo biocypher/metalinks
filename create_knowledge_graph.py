@@ -107,7 +107,7 @@ uniprot_node_fields = [
 ]
 
 hmdb_edge_types = [
-    HMDBEdgeType.PD,
+    HMDBEdgeType.PD_hmdb,
 
 ]
 
@@ -116,11 +116,11 @@ stitch_edge_types = [
 ]
 
 recon_edge_types = [
-    ReconEdgeType.PD,
+    ReconEdgeType.PD_recon,
 ]
 
 hmr_edge_types = [
-    HmrEdgeType.PD,
+    HmrEdgeType.PD_hmr,
 ]
 
 cellphone_edge_types = [
@@ -275,11 +275,11 @@ def main():
     bc.write_edges(CELLPHONE.get_edges())
     bc.write_edges(NEURONCHAT.get_edges())
     bc.write_edges(STITCH.get_edges()) # high RAM, thus attention at the beginning
-    bc.write_nodes(HMDB.get_nodes())
-    bc.write_nodes(UNIPROT.get_nodes())
     bc.write_edges(RECON.get_edges())
     bc.write_edges(HMR.get_edges())
     bc.write_edges(HMDB.get_edges())
+    bc.write_nodes(UNIPROT.get_nodes())
+    bc.write_nodes(HMDB.get_nodes())
 
  
 

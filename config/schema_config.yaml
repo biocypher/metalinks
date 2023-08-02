@@ -54,7 +54,7 @@ hmdb production degradation:
   represented_as: edge
   source: small molecule
   target: protein
-  label_in_input: PD
+  label_in_input: PD_hmdb
   properties:
     # met_name: str
     direction: str
@@ -69,7 +69,7 @@ recon production degradation:
   represented_as: edge
   source: small molecule
   target: protein
-  label_in_input: PD
+  label_in_input: PD_recon
   properties:
     status: str
     direction: str
@@ -83,7 +83,7 @@ hmr production degradation:
   represented_as: edge
   source: small molecule
   target: protein
-  label_in_input: PD
+  label_in_input: PD_hmr
   properties:
     status: str
     direction: str

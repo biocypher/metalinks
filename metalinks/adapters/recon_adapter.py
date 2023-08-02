@@ -23,7 +23,7 @@ class ReconEdgeType(Enum):
     """
     RECON edge types.
     """
-    PD = "PD"
+    PD_recon = "PD_recon"
 
 class ReconMetaboliteToProteinEdgeField(Enum):
     """
@@ -70,9 +70,9 @@ class ReconAdapter:
         recon_symbols_path = 'data/recon_gene_symbols.csv'
 
         map1_path = 'data/mapping_tables/global_ID_mapping_curated.tsv'
-        map2_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/metmap_curated.csv'
+        map2_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/metmap_curated.csv' # can be obtained here:  
         map3_path = 'data/mapping_tables/hmdb_mapping.csv'
-        # map4_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/recon3D_anno_curated.csv'
+        
 
         recon = sio.loadmat(recon_path)
         symbols = pd.read_csv(recon_symbols_path, sep=';')
@@ -107,7 +107,6 @@ class ReconAdapter:
         metabolite_to_gene['subsystem'] = metabolite_to_gene['reaction_id'].map(ss_dict)    
         metabolite_to_gene['compartment'] = metabolite_to_gene['metabolite_id'].apply(lambda x: x.split('[')[1])
         metabolite_to_gene['compartment'] = metabolite_to_gene['compartment'].apply(lambda x: x.split(']')[0])
-        metabolite_to_gene['subsystem'].value_counts()
         metabolite_to_gene['transport'] = 'unknown'
 
         # if compartment is c, the subsystem is 'Transport, Extracellular'then transport is 'e->c'
@@ -189,7 +188,7 @@ class ReconAdapter:
             }
             r = row[1].astype(str)
             h = hashlib.md5(''.join(r).encode('utf-8')).hexdigest()
-            yield h, row[1]['hmdb_id'], row[1]['uniprot'], 'PD', attributes
+            yield h, row[1]['hmdb_id'], row[1]['uniprot'], 'PD_recon', attributes
 
 
 def get_gene_symbols(rxn_gene_df):
@@ -222,9 +221,9 @@ def get_metabolite_to_gene(reaction_to_metabolites_prod, reaction_to_metabolites
     metabolite_to_gene = pd.concat([metabolite_to_gene, metabolite_to_gene_deg])
     metabolite_to_gene['direction'] = metabolite_to_gene['direction'].apply(lambda x: 'producing' if x != 'degrading' else x)
     reversible_reactions = lb_ub[lb_ub['rev'] == 'reversible'].index
-    rev_df = metabolite_to_gene[metabolite_to_gene['reaction_id'].isin(reversible_reactions)]
-    rev_df['direction'] = rev_df['direction'].apply(lambda x: 'degrading' if x == 'producing' else 'producing')
-    metabolite_to_gene = pd.concat([metabolite_to_gene, rev_df])
+    # rev_df = metabolite_to_gene[metabolite_to_gene['reaction_id'].isin(reversible_reactions)]
+    # rev_df['direction'] = rev_df['direction'].apply(lambda x: 'degrading' if x == 'producing' else 'producing')
+    # metabolite_to_gene = pd.concat([metabolite_to_gene, rev_df])
     metabolite_to_gene['rev'] = metabolite_to_gene['reaction_id'].apply(lambda x: 'reversible' if x in reversible_reactions else 'irreversible')
     return metabolite_to_gene
 

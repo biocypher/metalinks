@@ -73,7 +73,7 @@ class HMDBEdgeType(Enum):
     HMDB edges.
     """
 
-    PD = "PD"
+    PD_hmdb = "PD_hmdb"
 
 
 class HMDBMetaboliteToProteinEdgeField(Enum):
@@ -200,4 +200,4 @@ class HMDBAdapter:
         
         for index in range(len(reactions)):
             attributes = reactions.iloc[index, 3:].to_dict()
-            yield reactions["reaction_id"][index], reactions['Metabolite'][index], reactions['uniprot'][index], 'PD', attributes
+            yield reactions["reaction_id"][index], reactions['Metabolite'][index], reactions['uniprot'][index], 'PD_hmdb', attributes

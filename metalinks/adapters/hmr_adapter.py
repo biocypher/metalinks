@@ -24,7 +24,7 @@ class HmrEdgeType(Enum):
     """
     HMR edge types.
     """
-    PD = "PD"
+    PD_hmr = "PD_hmr"
 
 class HmrMetaboliteToProteinEdgeField(Enum):
     """
@@ -71,7 +71,7 @@ class HmrAdapter:
         hmr = hmr['ihuman']
         genes = pd.read_csv('data/HMR/genes.tsv', sep='\t', index_col=0)
         reactions = pd.read_csv('data/HMR/reactions.tsv', sep='\t', index_col=0)
-        metabolites = pd.read_csv('data/metabolites.tsv', sep='\t', index_col=0)
+        metabolites = pd.read_csv('data/HMR/metabolites.tsv', sep='\t', index_col=0)
 
         data = hmr
 
@@ -142,7 +142,7 @@ class HmrAdapter:
             }
             r = row[1].astype(str)
             h = hashlib.md5(''.join(r).encode('utf-8')).hexdigest()
-            yield h, row[1]['hmdb_id'], row[1]['uniprot'], 'PD', attributes
+            yield h, row[1]['hmdb_id'], row[1]['uniprot'], 'PD_hmr', attributes
 
 
 def get_gene_symbols(rxn_gene_df):
@@ -188,9 +188,9 @@ def get_metabolite_to_gene(reaction_to_metabolites_prod, reaction_to_metabolites
     metabolite_to_gene = pd.concat([metabolite_to_gene, metabolite_to_gene_deg])
     metabolite_to_gene['direction'] = metabolite_to_gene['direction'].apply(lambda x: 'producing' if x != 'degrading' else x)
     reversible_reactions = lb_ub[lb_ub['rev'] == 'reversible'].index
-    rev_df = metabolite_to_gene[metabolite_to_gene['reaction_id'].isin(reversible_reactions)]
-    rev_df['direction'] = rev_df['direction'].apply(lambda x: 'degrading' if x == 'producing' else 'producing')
-    metabolite_to_gene = pd.concat([metabolite_to_gene, rev_df])
+    # rev_df = metabolite_to_gene[metabolite_to_gene['reaction_id'].isin(reversible_reactions)]
+    # rev_df['direction'] = rev_df['direction'].apply(lambda x: 'degrading' if x == 'producing' else 'producing')
+    # metabolite_to_gene = pd.concat([metabolite_to_gene, rev_df])
     metabolite_to_gene['rev'] = metabolite_to_gene['reaction_id'].apply(lambda x: 'reversible' if x in reversible_reactions else 'irreversible')
     return metabolite_to_gene
 
