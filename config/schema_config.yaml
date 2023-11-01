@@ -27,7 +27,6 @@ protein:
   preferred_id: uniprot
   label_in_input: protein
   properties:
-    secondary_ids: str[]
     length: int
     mass: int
     protein_names: str[]
