@@ -1,8 +1,6 @@
 # adapted from CROssBAR project
-
 from time import time
-import collections
-from typing import Dict, List, Optional
+from typing import Optional
 from enum import Enum, auto
 from functools import lru_cache
 from pandas import read_csv
@@ -17,7 +15,6 @@ from bioregistry import normalize_curie
 from pypath.utils import mapping
 
 logger.debug(f"Loading module {__name__}.")
-
 
 class UniprotNodeType(Enum):
     """
@@ -36,7 +33,6 @@ class UniprotNodeField(Enum):
     """
 
     # core attributes
-    PROTEIN_SECONDARY_IDS = "secondary_ids"
     PROTEIN_LENGTH = "length"
     PROTEIN_MASS = "mass"
     PROTEIN_ORGANISM = "organism"
@@ -55,31 +51,6 @@ class UniprotNodeField(Enum):
     PROTEIN_SYMBOL = "symbol"
     PROTEIN_RECEPTOR_TYPE = "receptor_type"
     PROTEIN_SUBCELLULAR_LOCATION = "subcellular_location" 
-
-
-# class UniprotEdgeType(Enum):
-#     """
-#     Edge types of the UniProt API represented in this adapter.
-#     """
-
-#     PROTEIN_TO_ORGANISM = auto()
-#     GENE_TO_PROTEIN = auto()
-#     PROTEIN_TO_LOCATION = auto()
-
-
-# class UniprotEdgeField(Enum):
-#     """
-#     Fields of edges of the UniProt API represented in this adapter. Used to
-#     assign source and target identifiers in `get_edges()`.
-#     """
-
-#     # default
-#     PROTEIN_UNIPROT_ACCESSION = auto()
-#     GENE_ENTREZ_ID = auto()
-#     ORGANISM_NCBI_TAXONOMY_ID = auto()
-
-#     # optional
-#     GENE_ENSEMBL_GENE_ID = auto()
 
 
 class Uniprot:
@@ -190,29 +161,12 @@ class Uniprot:
                 continue
             elif query_key != UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION.value:
                 self.data[query_key] = uniprot.uniprot_data(
-                    query_key, self.organism, self.rev
+                    field=query_key, organism=self.organism, reviewed=self.rev
                 )
             else:
                 self.data[query_key] = uniprot.uniprot_locations(self.organism, self.rev)
 
             logger.debug(f"{query_key} field is downloaded")
-
-        secondary_ids = uniprot.get_uniprot_sec(None)
-        self.data[
-            UniprotNodeField.PROTEIN_SECONDARY_IDS.value
-        ] = collections.defaultdict(list)
-
-        # TODO why loop twice?
-        for sec_id in secondary_ids:
-            self.data[UniprotNodeField.PROTEIN_SECONDARY_IDS.value][
-                sec_id[1]
-            ].append(sec_id[0])
-        for k, v in self.data[
-            UniprotNodeField.PROTEIN_SECONDARY_IDS.value
-        ].items():
-            self.data[UniprotNodeField.PROTEIN_SECONDARY_IDS.value][
-                k
-            ] = ";".join(v)
 
         # add ensembl gene ids
         self.data[UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value] = {}
@@ -393,116 +347,6 @@ class Uniprot:
                     if location:
 
                         yield (location, "location",{})
-
-
-    # def get_edges(self):
-    #     """
-    #     Get nodes and edges from UniProt data.
-    #     """
-
-    #     logger.info(
-    #         "Preparing UniProt edges of the types "
-    #         f"{[type.name for type in self.edge_types]}."
-    #     )
-
-    #     # create lists of edges
-    #     edge_list = []
-
-    #     # generic properties for all edges for now
-    #     properties = {
-    #         "source": self.data_source,
-    #         "licence": self.data_licence,
-    #         "version": self.data_version,
-    #     }
-
-    #     for protein in tqdm(self.uniprot_ids):
-
-    #         protein_id = self._normalise_curie_cached("uniprot", protein)
-
-    #         if UniprotEdgeType.GENE_TO_PROTEIN in self.edge_types:
-
-    #             type_dict = {
-    #                 UniprotNodeField.PROTEIN_ENTREZ_GENE_IDS.value: "ncbigene",
-    #                 UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value: "ensembl",
-    #             }
-
-    #             # find preferred identifier for gene
-    #             if UniprotEdgeField.GENE_ENTREZ_ID in self.edge_fields:
-
-    #                 id_type = UniprotNodeField.PROTEIN_ENTREZ_GENE_IDS.value
-
-    #             elif UniprotEdgeField.GENE_ENSEMBL_GENE_ID in self.edge_fields:
-
-    #                 id_type = UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value
-
-    #             genes = self.data.get(id_type).get(protein)
-
-    #             if not genes:
-    #                 continue
-
-    #             genes = self._ensure_iterable(genes)
-
-    #             for gene in genes:
-
-    #                 if not gene:
-    #                     continue
-
-    #                 gene_id = self._normalise_curie_cached(
-    #                     type_dict[id_type],
-    #                     gene,
-    #                 )
-    #                 edge_list.append(
-    #                     (None, gene_id, protein_id, "Encodes", properties)
-    #                 )
-
-    #         if UniprotEdgeType.PROTEIN_TO_ORGANISM in self.edge_types:
-
-    #             # TODO all of this processing in separate function
-    #             # is it even still necessary?
-
-    #             organism_id = (
-    #                 self.data.get(UniprotNodeField.PROTEIN_ORGANISM_ID.value)
-    #                 .get(protein)
-    #             )
-
-    #             if organism_id:
-
-    #                 organism_id = self._normalise_curie_cached(
-    #                     "ncbitaxon", organism_id
-    #                 )
-    #                 edge_list.append(
-    #                     (
-    #                         None,
-    #                         protein_id,
-    #                         organism_id,
-    #                         "Belongs_To",
-    #                         properties,
-    #                     )
-    #                 )
-
-    #         if UniprotEdgeType.PROTEIN_TO_LOCATION in self.edge_types:
-
-    #             locations_list = (
-    #                 self.data.get(UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION.value)
-    #                 .get(protein)
-    #             )
-
-    #             if locations_list:
-    #                 for element in locations_list:
-
-    #                     edge_list.append(
-    #                         (
-    #                             None,
-    #                             protein_id,
-    #                             element,
-    #                             "Found_in",
-    #                             {},
-    #                         )
-    #                 )
-
-    #     if edge_list:
-
-    #         return edge_list
 
     def _reformat_and_filter_proteins(self):
         """
@@ -846,7 +690,6 @@ class Uniprot:
     def _configure_fields(self):
         # fields that need splitting
         self.split_fields = [
-            UniprotNodeField.PROTEIN_SECONDARY_IDS.value,
             UniprotNodeField.PROTEIN_PROTEOME.value,
             UniprotNodeField.PROTEIN_GENE_NAMES.value,
             UniprotNodeField.PROTEIN_EC.value,
@@ -857,7 +700,6 @@ class Uniprot:
 
         # properties of nodes
         self.protein_properties = [
-            UniprotNodeField.PROTEIN_SECONDARY_IDS.value,
             UniprotNodeField.PROTEIN_LENGTH.value,
             UniprotNodeField.PROTEIN_MASS.value,
             UniprotNodeField.PROTEIN_NAMES.value,

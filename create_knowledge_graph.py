@@ -1,12 +1,7 @@
 import cProfile
 import io
 import pstats
-import sys
 from biocypher import BioCypher
-
-# set working directory
-import os
-os.chdir("/home/efarr/Documents/GitHub/metalinks-biocypher")
 
 from metalinks.adapters.hmdb_adapter import (
     HMDBAdapter,
@@ -53,8 +48,6 @@ from metalinks.adapters.neuronchat_adapter import (
     NeuronchatMetaboliteToProteinEdgeField,
 )
 
-import biocypher
-
 PROFILE = False
 
 # Configure node types and fields
@@ -86,7 +79,6 @@ hmdb_node_fields = [
 ]
 
 uniprot_node_fields = [
-    UniprotNodeField.PROTEIN_SECONDARY_IDS,
     UniprotNodeField.PROTEIN_LENGTH,
     UniprotNodeField.PROTEIN_MASS,
     UniprotNodeField.PROTEIN_ORGANISM,
@@ -236,7 +228,7 @@ def main():
         )
     
     UNIPROT.download_uniprot_data(
-        cache=True,
+        cache=False,
         retries=5,
     )
 
