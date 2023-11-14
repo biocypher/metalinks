@@ -70,7 +70,7 @@ class ReconAdapter:
         recon_symbols_path = 'data/recon_gene_symbols.csv'
 
         map1_path = 'data/mapping_tables/global_ID_mapping_curated.tsv'
-        map2_path = '/home/efarr/Documents/metalinks/Data/Intermediate/Mapping/metmap_curated.csv' # can be obtained here:  
+        map2_path = '/Users/ef6/Documents/Saez/metalinks/Data/Intermediate/Mapping/metmap_curated.csv' # can be obtained here:  
         map3_path = 'data/mapping_tables/hmdb_mapping.csv'
         
 
@@ -171,9 +171,16 @@ class ReconAdapter:
         metabolite_to_gene.drop_duplicates(inplace=True)
         metabolite_to_gene.dropna(subset=['hmdb_id'], inplace=True)
         metabolite_to_gene['status'] = 'recon'
-        metabolite_to_gene['uniprot'] = symbol_to_uniprot(metabolite_to_gene['gene_id'])
-        # fuse a 'uniprot:' uniprot columns
+        # metabolite_to_gene['uniprot'] = symbol_to_uniprot(metabolite_to_gene['gene_id'])
+        uniprot_df = mapping.translation_df('uniprot', 'genesymbol')
+        if 'RORA' not in uniprot_df['genesymbol'].values: #solves weird error that sometimes pypath gives the wrong column names
+            uniprot_df = uniprot_df.rename(columns={'genesymbol': 'uniprot', 'uniprot': 'genesymbol'})
+
+        uniprot_dict = dict(zip(uniprot_df['genesymbol'], uniprot_df['uniprot']))
+        metabolite_to_gene['uniprot'] = metabolite_to_gene['gene_id'].map(uniprot_dict)
+        metabolite_to_gene.dropna(subset=['uniprot'], inplace=True)
         metabolite_to_gene['uniprot'] = metabolite_to_gene['uniprot'].apply(lambda x: 'uniprot:' + x if x is not np.nan else x)
+        
         
 
         for row in tqdm(metabolite_to_gene.iterrows()):

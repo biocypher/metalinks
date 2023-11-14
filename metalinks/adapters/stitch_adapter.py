@@ -65,10 +65,10 @@ class STITCHAdapter:
         print( 'Getting MR connections from STITCH... ')
               
         # prepare stitch data
-        details_path = '/home/efarr/Documents/metalinks/Data/Source/Stitch/9606.protein_chemical.links.detailed.v5.0.tsv' # can be dowloaded at the stitch website: http://stitch.embl.de/cgi/download.pl?UserId=n5QdzJfmvzSj&sessionId=5nq4BYfHQNmU
-        actions_path = '/home/efarr/Documents/metalinks/Data/Source/Stitch/9606.actions.v5.0.tsv'
+        details_path = '/Users/ef6/Documents/Saez/Data/Source/Stitch/9606.protein_chemical.links.detailed.v5.0.tsv' # can be dowloaded at the stitch website: http://stitch.embl.de/cgi/download.pl?UserId=n5QdzJfmvzSj&sessionId=5nq4BYfHQNmU
+        actions_path = '/Users/ef6/Documents/Saez/Data/Source/Stitch/9606.actions.v5.0.tsv'
 
-        actions = pl.scan_csv(actions_path, sep='\t')
+        actions = pl.scan_csv(actions_path, separator='\t')
         flipped = actions.filter(pl.col('item_id_a').str.contains('9606')).select(['item_id_b', 'item_id_a', 'mode'])
         df1 = flipped.collect()
         df1 = df1.rename({'item_id_a': 'protein', 'item_id_b': 'chemical', 'mode': 'mode'})
@@ -78,7 +78,7 @@ class STITCHAdapter:
         df2 = df2.rename({'item_id_a': 'chemical', 'item_id_b': 'protein', 'mode': 'mode'})
         df = pl.concat([df1, df2], how='vertical')
 
-        details = pl.scan_csv(details_path, sep='\t')
+        details = pl.scan_csv(details_path, separator='\t')
         data = details.collect()
 
         interactions = data.join(df, on=['chemical', 'protein'], how='left')
@@ -90,10 +90,9 @@ class STITCHAdapter:
         interactions = interactions.with_columns(pl.col('protein').str.replace('9606.', ''))
         interactions = interactions.with_columns(pl.col('chemical').str.slice(4, None).cast(pl.Int64))
 
-        # mapping
-        map_dict = hmdb.hmdb_mapping('pubchem_compound_id', 'accession')
-        for k, v in map_dict.items():
-            map_dict[k] = v.pop()
+        met_table = hmdb.metabolites_table('accession',  'pubchem_compound_id')
+
+        map_dict = dict(zip(met_table.iloc[:,1], met_table.iloc[:,0]))
         interactions = interactions.with_columns(pl.col('chemical').cast(pl.Utf8).map_dict(map_dict).alias('metabolite'))
         interactions = interactions.filter(pl.col('metabolite').is_not_null())
 
@@ -108,8 +107,10 @@ class STITCHAdapter:
         }
 
         # Assuming `df` is your DataFrame
-        interactions = interactions.with_column(pl.col("mode").apply(lambda x: order[x], return_dtype=pl.Int32).alias("mode_order"))
+        # interactions = interactions.with_columns(pl.col("mode").apply(lambda x: order[x], return_dtype=pl.Int32).alias("mode_order"))
+        interactions = interactions.with_columns(pl.col("mode").map_dict(order).alias("mode_order"))
 
+        
         # Now, sort the DataFrame based on the new column and then drop it
         interactions = interactions.sort("mode_order").drop("mode_order")       
 
@@ -118,28 +119,38 @@ class STITCHAdapter:
         interactions = interactions.with_columns(reaction_id)
         interactions = interactions.rename({'': 'reaction_id'})
 
-        counter = 0
+        uniprot_df = mapping.translation_df('ensp_biomart', 'uniprot')
+        uniprot_df.rename(columns={'ensp_biomart': 'protein'}, inplace=True)
 
-        for row in interactions.iterrows():
-            attributes = {'mode': row[7], 
-                          'database': row[2], 
-                          'experiment': row[3], 
-                          'prediction': row[4], 
-                          'textmining': row[5], 
-                          'combined_score': row[6],
-                        }
+        # uniprot_df2 = mapping.translation_df('ensp', 'uniprot')
+        # uniprot_df2.rename(columns={'ensp': 'protein'}, inplace=True)
+
+        # #fill in missing uniprot ids in uniprot_df from uniport_df2
+        # uniprot_df = uniprot_df.set_index('protein').combine_first(uniprot_df2.set_index('protein')).reset_index()
+        uniprot_dict = dict(zip(uniprot_df['protein'], uniprot_df['uniprot']))
+
+        interactions = interactions.with_columns(pl.col('protein').cast(pl.Utf8).map_dict(uniprot_dict).alias('uniprot'))
+        #fuse a uniprot: to the beginning of the uniprot ids
+        interactions = interactions.with_columns(pl.col('uniprot').cast(pl.Utf8).apply(lambda x: 'uniprot:' + x).alias('uniprot'))
+
+
+
+        for row in interactions.iter_rows():
+
+            attributes = {
+                'mode': row[7],
+                'database': row[2],
+                'experiment': row[3],
+                'prediction': row[4],
+                'textmining': row[5],
+                'combined_score': row[6],
+            }
             
-            uniprot = mapping.map_name(row[1], 'ensp_biomart', 'uniprot')
-            if uniprot is None:
-                uniprot = mapping.map_name(row[1], 'ensp', 'uniprot')
-            if uniprot != set():
-                uniprot =  'uniprot:' + uniprot.pop()
-
-            else:
-                continue
-
-            # counter += 1
-            # if counter > 100:
-            #     break
-
-            yield row[9], row[8], uniprot, 'MR', attributes
+            # uniprot = mapping.map_name(row[1], 'ensp_biomart', 'uniprot')
+            # if uniprot is None:
+            #     uniprot = mapping.map_name(row[1], 'ensp', 'uniprot')
+            # if uniprot != set():
+            #     uniprot = 'uniprot:' + uniprot.pop()
+            # else:
+            #     continue
+            yield str(row[9]), row[8], row[10], 'MR', attributes # only temporary fix 

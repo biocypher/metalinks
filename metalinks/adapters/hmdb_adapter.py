@@ -128,7 +128,7 @@ class HMDBAdapter:
 
         print(  "Getting metabolites"  )
 
-        data = hmdb.hmdb_table(
+        data = hmdb.metabolites_table(
             'accession',
             'kegg_id',
             'chebi_id',
@@ -151,6 +151,7 @@ class HMDBAdapter:
         data['class'] = data['taxonomy'].apply(lambda x: x['class'])
         data['sub_class'] = data['taxonomy'].apply(lambda x: x['sub_class'])
         data['molecular_framework'] = data['taxonomy'].apply(lambda x: x['molecular_framework'])
+        data['name'] = data['name'].apply(lambda x: x.replace('"', "'") if '"' in x else x)
         
 
 
@@ -185,6 +186,7 @@ class HMDBAdapter:
         reactions = read_csv(reactions_path, sep=',')
         reactions['HMDBP'] = reactions['HMDBP'].apply(lambda x: id_conversion[x] if x in id_conversion else None)
         reactions.rename(columns={'HMDBP': 'uniprot'}, inplace=True)
+        reactions.dropna(subset=['uniprot'], inplace=True)
 
         tdb = read_csv('data/TransportDB2.0_translated.tsv', sep='\t')
         reactions['subsystem'] = 'unknown'

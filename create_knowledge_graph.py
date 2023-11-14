@@ -3,6 +3,10 @@ import io
 import pstats
 from biocypher import BioCypher
 
+# set working directory
+import os
+os.chdir("/Users/ef6/Documents/GitHub/metalinks")
+
 from metalinks.adapters.hmdb_adapter import (
     HMDBAdapter,
     HMDBEdgeType,
@@ -224,11 +228,11 @@ def main():
             organism="9606",
             node_types=uniprot_node_types,
             node_fields=uniprot_node_fields,
-            test_mode=True,
+            test_mode=False,
         )
     
     UNIPROT.download_uniprot_data(
-        cache=False,
+        cache=True,
         retries=5,
     )
 
@@ -236,7 +240,7 @@ def main():
     STITCH = STITCHAdapter(
         edge_types=stitch_edge_types,
         edge_fields=stitch_edge_fields,
-        test_mode=True,
+        test_mode=False,
     )
 
     RECON = ReconAdapter(
@@ -277,8 +281,7 @@ def main():
 
     # convenience and stats
     bc.write_import_call()
-    bc.log_missing_bl_types()
-    bc.log_duplicates()
+    bc.summary()
 
     ######################
     # END OF ACTUAL CODE #
