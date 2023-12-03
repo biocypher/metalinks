@@ -65,7 +65,7 @@ class STITCHAdapter:
         print( 'Getting MR connections from STITCH... ')
               
         # prepare stitch data
-        details_path = '/Users/ef6/Documents/Saez/Data/Source/Stitch/9606.protein_chemical.links.detailed.v5.0.tsv' # can be dowloaded at the stitch website: http://stitch.embl.de/cgi/download.pl?UserId=n5QdzJfmvzSj&sessionId=5nq4BYfHQNmU
+        details_path = '/Users/ef6/Documents/Saez/Data/Source/Stitch/9606.protein_chemical.links.detailed.v5.0.tsv' # can be dowloaded here: https://zenodo.org/records/10200150 or the stitch website: http://stitch.embl.de/cgi/download.pl?UserId=n5QdzJfmvzSj&sessionId=5nq4BYfHQNmU
         actions_path = '/Users/ef6/Documents/Saez/Data/Source/Stitch/9606.actions.v5.0.tsv'
 
         actions = pl.scan_csv(actions_path, separator='\t')
@@ -86,7 +86,6 @@ class STITCHAdapter:
         del df
         interactions = interactions.filter((pl.col('combined_score') > 150) & (pl.col('mode').is_not_null()) ) # change to lower cutoff later
 
-        #aesthetics
         interactions = interactions.with_columns(pl.col('protein').str.replace('9606.', ''))
         interactions = interactions.with_columns(pl.col('chemical').str.slice(4, None).cast(pl.Int64))
 
@@ -106,15 +105,9 @@ class STITCHAdapter:
             'catalysis': 7
         }
 
-        # Assuming `df` is your DataFrame
-        # interactions = interactions.with_columns(pl.col("mode").apply(lambda x: order[x], return_dtype=pl.Int32).alias("mode_order"))
         interactions = interactions.with_columns(pl.col("mode").map_dict(order).alias("mode_order"))
-
-        
-        # Now, sort the DataFrame based on the new column and then drop it
         interactions = interactions.sort("mode_order").drop("mode_order")       
 
-        # add as hash per reaction
         reaction_id  = interactions.hash_rows(seed=42) # change to md5 later
         interactions = interactions.with_columns(reaction_id)
         interactions = interactions.rename({'': 'reaction_id'})
@@ -122,18 +115,10 @@ class STITCHAdapter:
         uniprot_df = mapping.translation_df('ensp_biomart', 'uniprot')
         uniprot_df.rename(columns={'ensp_biomart': 'protein'}, inplace=True)
 
-        # uniprot_df2 = mapping.translation_df('ensp', 'uniprot')
-        # uniprot_df2.rename(columns={'ensp': 'protein'}, inplace=True)
-
-        # #fill in missing uniprot ids in uniprot_df from uniport_df2
-        # uniprot_df = uniprot_df.set_index('protein').combine_first(uniprot_df2.set_index('protein')).reset_index()
         uniprot_dict = dict(zip(uniprot_df['protein'], uniprot_df['uniprot']))
 
         interactions = interactions.with_columns(pl.col('protein').cast(pl.Utf8).map_dict(uniprot_dict).alias('uniprot'))
-        #fuse a uniprot: to the beginning of the uniprot ids
         interactions = interactions.with_columns(pl.col('uniprot').cast(pl.Utf8).apply(lambda x: 'uniprot:' + x).alias('uniprot'))
-
-
 
         for row in interactions.iter_rows():
 
@@ -145,12 +130,5 @@ class STITCHAdapter:
                 'textmining': row[5],
                 'combined_score': row[6],
             }
-            
-            # uniprot = mapping.map_name(row[1], 'ensp_biomart', 'uniprot')
-            # if uniprot is None:
-            #     uniprot = mapping.map_name(row[1], 'ensp', 'uniprot')
-            # if uniprot != set():
-            #     uniprot = 'uniprot:' + uniprot.pop()
-            # else:
-            #     continue
+
             yield str(row[9]), row[8], row[10], 'MR', attributes # only temporary fix 

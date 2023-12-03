@@ -47,26 +47,6 @@ class HMDBMetaboliteNodeField(Enum):
     METABOLITE_SUB_CLASS = "sub_class"
     METABOLITE_MOLECULAR_FRAMEWORK = "molecular_framework"
 
-    
-
-    
-
-
-# class HMDBProteinNodeField(Enum):
-#     """
-#     Fields available for DepMap compounds.
-#     """
-
-#     PROTEIN_ID = "uniprot"
-#     _PRIMARY_ID = PROTEIN_ID
-
-#     PROTEIN_SYMBOL = "symbol"
-#     PROTEIN_HMDBP_ID = "hmdbp_id"
-#     PROTEIN_PATHWAYS = "pathways"
-#     PROTEIN_METABOLITES = "metabolites"
-
-
-
 
 class HMDBEdgeType(Enum):
     """
@@ -144,7 +124,6 @@ class HMDBAdapter:
         data['cellular_locations'] = data['biological_properties'].apply(lambda x: x['cellular_locations'])
         data['biospecimen_locations'] = data['biological_properties'].apply(lambda x: x['biospecimen_locations'])
         data['tissue_locations'] = data['biological_properties'].apply(lambda x: x['tissue_locations'])
-        # extract pathways name information from pathways key in biological_properties column
         data['pathways'] = data['biological_properties'].apply(lambda x: [pathway['name'] for pathway in x['pathways']])
         data['diseases'] = data['diseases'].apply(lambda x: [disease['name'] for disease in x])
         data['kingdom'] = data['taxonomy'].apply(lambda x: x['kingdom'])
@@ -153,15 +132,9 @@ class HMDBAdapter:
         data['molecular_framework'] = data['taxonomy'].apply(lambda x: x['molecular_framework'])
         data['name'] = data['name'].apply(lambda x: x.replace('"', "'") if '"' in x else x)
         
-
-
         for index in range(len(data)):
             attributes = data.iloc[index, 1:].to_dict()
             yield data.iloc[index, 0], 'hmdb_metabolite', attributes
-
-
-
-
 
     def get_edges(self):
         """

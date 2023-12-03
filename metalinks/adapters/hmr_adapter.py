@@ -126,7 +126,6 @@ class HmrAdapter:
         metabolite_to_gene.drop_duplicates(inplace=True)
         metabolite_to_gene.dropna(subset=['hmdb_id'], inplace=True)
         metabolite_to_gene['status'] = 'hmr'
-        # metabolite_to_gene['uniprot'] = symbol_to_uniprot(metabolite_to_gene['gene_id'])
         uniprot_df = mapping.translation_df('uniprot', 'genesymbol')
         if 'RORA' not in uniprot_df['genesymbol'].values: #solves weird error that sometimes pypath gives the wrong column names
             uniprot_df = uniprot_df.rename(columns={'genesymbol': 'uniprot', 'uniprot': 'genesymbol'})
@@ -195,9 +194,6 @@ def get_metabolite_to_gene(reaction_to_metabolites_prod, reaction_to_metabolites
     metabolite_to_gene = pd.concat([metabolite_to_gene, metabolite_to_gene_deg])
     metabolite_to_gene['direction'] = metabolite_to_gene['direction'].apply(lambda x: 'producing' if x != 'degrading' else x)
     reversible_reactions = lb_ub[lb_ub['rev'] == 'reversible'].index
-    # rev_df = metabolite_to_gene[metabolite_to_gene['reaction_id'].isin(reversible_reactions)]
-    # rev_df['direction'] = rev_df['direction'].apply(lambda x: 'degrading' if x == 'producing' else 'producing')
-    # metabolite_to_gene = pd.concat([metabolite_to_gene, rev_df])
     metabolite_to_gene['rev'] = metabolite_to_gene['reaction_id'].apply(lambda x: 'reversible' if x in reversible_reactions else 'irreversible')
     return metabolite_to_gene
 
@@ -215,42 +211,3 @@ def symbol_to_uniprot(ensp_list):
         else:
             gene_symbol_list.append('NA')
     return gene_symbol_list
-
-
-
-# solution to exclude local files ( very slow)
-
-# from pypath.inputs import hmdb
-# map_table = hmdb.hmdb_table('pubchem_compound_id', 'accession', 'kegg_id', 'chebi_id')
-# names = ['pubchem', 'hmdb', 'kegg', 'chebi']
-# map_table['chebi_id'] = map_table['chebi_id'].apply(lambda x: 'CHEBI:' + x if not pd.isnull(x) else x)
-
-# map_dict = {}
-# for i in range(4):
-#     for j in range(4):
-#         if i != j:
-#             map_dict[(i, j)] = dict(zip(map_table.iloc[:, i], map_table.iloc[:, j]))
-#             map_dict[names[i] + '_' + names[j]] = map_dict.pop((i, j))
-
-# for key in map_dict.keys():
-#     map_dict[key] = {k: v for k, v in map_dict[key].items() if k is not None and v is not None}
-
-# for i in names:
-#     names_remain = names.copy()
-#     names_remain.remove(i)
-#     for j in df[i]:
-#         if j is not np.nan:
-#             for k in names_remain:
-#                 if j in map_dict[i + '_' + k].keys():
-#                     df[k][df[i] == j] = map_dict[i + '_' + k][j]
-
-# # update map_dict to include the mapping from df
-# for i in names:
-#     for j in names:
-#         if i != j:
-#             update = dict(zip(df[i], df[j]))
-#             # remove all the NA values in key and value
-#             update = {k: v for k, v in update.items() if k is not np.nan and v is not np.nan}
-#             map_dict[i + '_' + j].update(update)
-
-
