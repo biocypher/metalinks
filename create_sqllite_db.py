@@ -57,6 +57,9 @@ conn.execute("PRAGMA foreign_keys = ON;")
 # Load the data
 ## Metabolites
 mets = pd.read_csv("data/MetaboliteTable.csv")
+# TODO: Fix this issue in the Cypher query
+mets['hmdb'] = mets['hmdb'].replace(to_replace='"', value='', regex=True)
+mets['metabolite'] = mets['metabolite'].replace(to_replace='"', value='', regex=True)
 mets['pubchem'] = mets['pubchem'].apply(lambda x: '' if np.isnan(x) else str(int(x)))
 for column in mets.columns:
     if column not in ['hmdb', 'metabolite', 'pubchem']:
@@ -74,12 +77,17 @@ for column_name in columns_of_interest:
 # Proteins
 prots = pd.read_csv("data/ProteinTable.csv")
 
+# TODO: Fix this issue in the Cypher query
+prots['uniprot'] = prots['uniprot'].replace(to_replace='"', value='', regex=True)
+prots['gene_symbol'] = prots['gene_symbol'].replace(to_replace='"', value='', regex=True)
+
 # Metabolite-Protein Edges
 edges = pd.read_csv("data/EdgeTable.csv")
 edges['mor'] = edges['mor'].apply(lambda x: literal_eval(x) if isinstance(x, str) else x)
 # mor of length 1 then just keep that element, mor of length > 1 then 0
 edges['mor'] = edges['mor'].apply(lambda x: x[0] if len(x) == 1 else 0)
 edges['source'] = edges['source'].apply(lambda x: literal_eval(x) if isinstance(x, str) else x)
+edges = edges.replace(to_replace='"', value='', regex=True)
 
 # Create a DataFrame for Sources
 source_expanded = edges[['hmdb', 'uniprot', 'source']].explode('source')
@@ -123,10 +131,11 @@ CREATE TABLE IF NOT EXISTS edges (
 """
 
 source_query = """
-CREATE TABLE sources (
+CREATE TABLE source (
     hmdb VARCHAR(255),
     uniprot VARCHAR(255),
     source VARCHAR(255),
+    PRIMARY KEY (hmdb, uniprot, source),
     FOREIGN KEY (hmdb, uniprot) REFERENCES edges(hmdb, uniprot)
     ); """
 
@@ -141,7 +150,7 @@ with conn:
 mets.to_sql('metabolites', conn, if_exists='append', index=False)
 prots.to_sql('proteins', conn, if_exists='append', index=False)
 edges.to_sql('edges', conn, if_exists='append', index=False)
-source_expanded.to_sql('sources', conn, if_exists='append', index=False)
+source_expanded.to_sql('source', conn, if_exists='append', index=False)
 
 # Create Annotation Queries and Tables
 for key in expanded_dataframes:
