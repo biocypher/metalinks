@@ -1,6 +1,7 @@
+from os import path
+import sqlite3
 import pandas as pd
 import numpy as np
-import sqlite3
 from ast import literal_eval
 
 def expand_list_column(df, column_name, pk='hmdb'):
@@ -48,15 +49,13 @@ def create_table_query(annotation):
     """
     return query
 
-
-
 # Connect to the SQLite database (or create it if it doesn't exist)
-conn = sqlite3.connect('data/metalinks.db')
+conn = sqlite3.connect(path.join('data', 'metalinks.db'))
 conn.execute("PRAGMA foreign_keys = ON;")
 
 # Load the data
 ## Metabolites
-mets = pd.read_csv("data/MetaboliteTable.csv")
+mets = pd.read_csv(path.join('data', 'MetaboliteTable.csv'))
 # TODO: Fix this issue in the Cypher query
 mets['hmdb'] = mets['hmdb'].replace(to_replace='"', value='', regex=True)
 mets['metabolite'] = mets['metabolite'].replace(to_replace='"', value='', regex=True)
@@ -73,16 +72,15 @@ for column_name in columns_of_interest:
     df = expand_list_column(mets, column_name)
     expanded_dataframes[column_name] = df
 
-
 # Proteins
-prots = pd.read_csv("data/ProteinTable.csv")
+prots = pd.read_csv(path.join('data', 'ProteinTable.csv'))
 
 # TODO: Fix this issue in the Cypher query
 prots['uniprot'] = prots['uniprot'].replace(to_replace='"', value='', regex=True)
 prots['gene_symbol'] = prots['gene_symbol'].replace(to_replace='"', value='', regex=True)
 
 # Metabolite-Protein Edges
-edges = pd.read_csv("data/EdgeTable.csv")
+edges = pd.read_csv(path.join('data', 'EdgeTable.csv'))
 edges['mor'] = edges['mor'].apply(lambda x: literal_eval(x) if isinstance(x, str) else x)
 # mor of length 1 then just keep that element, mor of length > 1 then 0
 edges['mor'] = edges['mor'].apply(lambda x: x[0] if len(x) == 1 else 0)
@@ -161,7 +159,8 @@ for key in expanded_dataframes:
     # Populate
     expanded_dataframes[key].to_sql(key, conn, if_exists='append', index=False)
 
-### Cypher Queries used to generate the Input Data for the SQLite Database
+""" Cypher Queries used to generate the Input Data for the SQLite Database,
+from a Metalinks Neo4j dump, available at https://zenodo.org/records/10200150"""
 """
 //EdgeTable
 MATCH (m)-[a]->(p:Protein)
