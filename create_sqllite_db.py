@@ -18,9 +18,9 @@ def expand_list_column(df, column_name, pk='hmdb'):
     """
     # Ensure the column is in list form
     df[column_name] = df[column_name].apply(lambda x: literal_eval(x) if isinstance(x, str) else x)
-    
-    # Explode the column into a new DataFrame
     expanded_df = df[[pk, column_name]].explode(column_name)
+    expanded_df[column_name] = expanded_df[column_name].replace(to_replace='"', value='', regex=True)
+    expanded_df[column_name] = expanded_df[column_name].replace(to_replace="'", value='', regex=True)
     expanded_df = expanded_df.dropna().reset_index(drop=True).drop_duplicates()
     
     df.drop(column_name, axis=1, inplace=True)
