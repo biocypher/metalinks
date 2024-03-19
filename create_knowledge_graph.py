@@ -3,10 +3,6 @@ import io
 import pstats
 from biocypher import BioCypher
 
-# set working directory
-import os
-os.chdir("/Users/ef6/Documents/GitHub/metalinks")
-
 from metalinks.adapters.hmdb_adapter import (
     HMDBAdapter,
     HMDBEdgeType,
@@ -60,7 +56,7 @@ hmdb_node_types = [
 
 uniprot_node_types = [
     UniprotNodeType.PROTEIN,
-    #UniprotNodeType.CELLULAR_COMPARTMENT        ,
+    # UniprotNodeType.CELLULAR_COMPARTMENT        ,
 ]
 
 hmdb_node_fields = [
@@ -97,13 +93,11 @@ uniprot_node_fields = [
     UniprotNodeField.PROTEIN_KEGG_IDS,
     UniprotNodeField.PROTEIN_SYMBOL,
     UniprotNodeField.PROTEIN_RECEPTOR_TYPE,
-    #UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION,
-
+    # UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION,
 ]
 
 hmdb_edge_types = [
     HMDBEdgeType.PD_hmdb,
-
 ]
 
 stitch_edge_types = [
@@ -136,7 +130,6 @@ hmdb_edge_fields = [
     HMDBMetaboliteToProteinEdgeField.MET_NAME,
     HMDBMetaboliteToProteinEdgeField.STATUS,
     HMDBMetaboliteToProteinEdgeField.SUBSYSTEM,
-
 ]
 
 stitch_edge_fields = [
@@ -149,7 +142,6 @@ stitch_edge_fields = [
     STITCHMetaboliteToProteinEdgeField.PREDICTION,
     STITCHMetaboliteToProteinEdgeField.TEXTMINING,
     STITCHMetaboliteToProteinEdgeField.COMBINED_SCORE,
-
 ]
 
 
@@ -162,7 +154,7 @@ recon_edge_fields = [
     ReconMetaboliteToProteinEdgeField.SUBSYSTEM,
     ReconMetaboliteToProteinEdgeField.TRANSPORT,
     ReconMetaboliteToProteinEdgeField.TRANSPORT_DIRECTION,
-    ReconMetaboliteToProteinEdgeField.REV
+    ReconMetaboliteToProteinEdgeField.REV,
 ]
 
 hmr_edge_fields = [
@@ -174,21 +166,21 @@ hmr_edge_fields = [
     HmrMetaboliteToProteinEdgeField.SUBSYSTEM,
     HmrMetaboliteToProteinEdgeField.TRANSPORT,
     HmrMetaboliteToProteinEdgeField.TRANSPORT_DIRECTION,
-    HmrMetaboliteToProteinEdgeField.REV
+    HmrMetaboliteToProteinEdgeField.REV,
 ]
 
 cellphone_edge_fields = [
     CellphoneMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
     CellphoneMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
     CellphoneMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
-    CellphoneMetaboliteToProteinEdgeField.MODE
+    CellphoneMetaboliteToProteinEdgeField.MODE,
 ]
 
 neuronchat_edge_fields = [
     NeuronchatMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
     NeuronchatMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
     NeuronchatMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
-    NeuronchatMetaboliteToProteinEdgeField.MODE
+    NeuronchatMetaboliteToProteinEdgeField.MODE,
 ]
 
 
@@ -207,12 +199,11 @@ def main():
     ###############
 
     bc = BioCypher(
-    biocypher_config_path="config/biocypher_config.yaml",
+        biocypher_config_path="config/biocypher_config.yaml",
     )
-    
+
     # check schema
     bc.show_ontology_structure()
-    
 
     # create adapter
     HMDB = HMDBAdapter(
@@ -222,17 +213,16 @@ def main():
     )
 
     UNIPROT = Uniprot(
-            organism="9606",
-            node_types=uniprot_node_types,
-            node_fields=uniprot_node_fields,
-            test_mode=False,
-        )
-    
+        organism="9606",
+        node_types=uniprot_node_types,
+        node_fields=uniprot_node_fields,
+        test_mode=False,
+    )
+
     UNIPROT.download_uniprot_data(
         cache=True,
         retries=5,
     )
-
 
     STITCH = STITCHAdapter(
         edge_types=stitch_edge_types,
@@ -265,16 +255,14 @@ def main():
     )
 
     # write nodes and edges to csv
+    bc.write_nodes(UNIPROT.get_nodes())
+    bc.write_nodes(HMDB.get_nodes())
     bc.write_edges(CELLPHONE.get_edges())
     bc.write_edges(NEURONCHAT.get_edges())
-    bc.write_edges(STITCH.get_edges()) # high RAM, thus attention at the beginning
+    bc.write_edges(STITCH.get_edges())  # high RAM, thus attention at the beginning
     bc.write_edges(RECON.get_edges())
     bc.write_edges(HMR.get_edges())
     bc.write_edges(HMDB.get_edges())
-    bc.write_nodes(UNIPROT.get_nodes())
-    bc.write_nodes(HMDB.get_nodes())
-
- 
 
     # convenience and stats
     bc.write_import_call()
