@@ -102,10 +102,8 @@ class Uniprot:
             node_fields=node_fields,
         )
 
-
         # loading of subcellular locations set
         self.locations = set()
-
 
     def download_uniprot_data(
         self,
@@ -167,12 +165,12 @@ class Uniprot:
         self.data = {}
         for query_key in tqdm(self.node_fields):
             if query_key in [
-                UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value, 
+                UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value,
                 UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value,
-                'symbol'
+                "symbol",
             ]:
                 continue
-            
+
             elif query_key == UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION.value:
                 self.data[query_key] = uniprot.uniprot_locations(
                     self.organism, self.rev
@@ -211,10 +209,10 @@ class Uniprot:
 
             # do not process ensembl gene ids (we will get them from pypath)
             if arg in [
-                UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value, 
+                UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value,
                 UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value,
-                'symbol'
-                ]:
+                "symbol",
+            ]:
                 pass
 
             # Integers
@@ -224,22 +222,18 @@ class Uniprot:
                 UniprotNodeField.PROTEIN_ORGANISM_ID.value,
             ]:
                 for protein, attribute_value in self.data.get(arg).items():
-                    self.data[arg][protein] = int(
-                        str(attribute_value).replace(",", "")
-                    )
-            
+                    self.data[arg][protein] = int(str(attribute_value).replace(",", ""))
+
             # Simple replace
             elif arg not in self.split_fields:
-                if not arg in  [
+                if not arg in [
                     UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION.value,
-                    "subcellular_location"
+                    "subcellular_location",
                 ]:
                     for protein, attribute_value in self.data.get(arg).items():
 
                         self.data[arg][protein] = (
-                            attribute_value.replace("|", ",")
-                            .replace("'", "^")
-                            .strip()
+                            attribute_value.replace("|", ",").replace("'", "^").strip()
                         )
 
             # Split fields
@@ -247,9 +241,7 @@ class Uniprot:
 
                 for protein, attribute_value in self.data.get(arg).items():
                     # Field splitting
-                    self.data[arg][protein] = self._split_fields(
-                        arg, attribute_value
-                    )
+                    self.data[arg][protein] = self._split_fields(arg, attribute_value)
 
             # Special treatment
             # ENST and ENSG ids
@@ -262,15 +254,15 @@ class Uniprot:
                     )
 
                     # update enst in data dict
-                    self.data[
-                        UniprotNodeField.PROTEIN_ENSEMBL_TRANSCRIPT_IDS.value
-                    ][protein] = attribute_value
+                    self.data[UniprotNodeField.PROTEIN_ENSEMBL_TRANSCRIPT_IDS.value][
+                        protein
+                    ] = attribute_value
 
                     if ensg_ids:
                         # add ensgs to data dict
-                        self.data[
-                            UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value
-                        ][protein] = ensg_ids
+                        self.data[UniprotNodeField.PROTEIN_ENSEMBL_GENE_IDS.value][
+                            protein
+                        ] = ensg_ids
 
             # Protein names
             elif arg == UniprotNodeField.PROTEIN_NAMES.value:
@@ -304,7 +296,7 @@ class Uniprot:
                         self.locations.add(loc)
 
                     self.data[arg][protein] = individual_protein_locations
-    
+
     def get_nodes(self, ligand_or_receptor: bool = False):
         """
         Yield nodes (protein, gene, organism) from UniProt data.
@@ -315,8 +307,8 @@ class Uniprot:
             f"{[type.name for type in self.node_types]}."
         )
 
-        GtP = pd.read_csv('data/targets_and_families.csv', sep=',', skiprows=1)
-        target_dict = dict(zip(GtP['Human SwissProt'], GtP['Type']))
+        GtP = pd.read_csv("data/targets_and_families.csv", sep=",", skiprows=1)
+        target_dict = dict(zip(GtP["Human SwissProt"], GtP["Type"]))
 
         for uniprot_entity in self._reformat_and_filter_proteins():
 
@@ -324,18 +316,20 @@ class Uniprot:
 
             protein_props = self._get_protein_properties(all_props)
 
-            symbol = mapping.map_name(protein_id.split(':')[1], "uniprot", "genesymbol")
+            symbol = mapping.map_name(protein_id.split(":")[1], "uniprot", "genesymbol")
 
-            receptor_type = target_dict.get(protein_id.split(':')[1])
+            receptor_type = target_dict.get(protein_id.split(":")[1])
 
             if receptor_type:
-                protein_props[UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value] = receptor_type
+                protein_props[UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value] = (
+                    receptor_type
+                )
             else:
-                protein_props[UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value] = 'NA'
+                protein_props[UniprotNodeField.PROTEIN_RECEPTOR_TYPE.value] = "NA"
             if symbol:
                 protein_props[UniprotNodeField.PROTEIN_SYMBOL.value] = symbol.pop()
             else:
-                protein_props[UniprotNodeField.PROTEIN_SYMBOL.value] = 'NA'
+                protein_props[UniprotNodeField.PROTEIN_SYMBOL.value] = "NA"
 
             yield (protein_id, "protein", protein_props)
 
@@ -375,8 +369,8 @@ class Uniprot:
 
             for arg in self.node_fields:
                 if arg in [
-                    'symbol',
-                    'receptor_type',
+                    "symbol",
+                    "receptor_type",
                 ]:
                     continue
 
@@ -395,8 +389,7 @@ class Uniprot:
         # if genes and database(GeneID) fields exist, define gene_properties
         if not (
             UniprotNodeField.PROTEIN_GENE_NAMES.value in all_props.keys()
-            and UniprotNodeField.PROTEIN_ENTREZ_GENE_IDS.value
-            in all_props.keys()
+            and UniprotNodeField.PROTEIN_ENTREZ_GENE_IDS.value in all_props.keys()
         ):
             return []
 
@@ -484,9 +477,11 @@ class Uniprot:
             # define protein_properties
             if k not in self.protein_properties:
                 continue
-            
-            if k == UniprotNodeField.PROTEIN_NAMES.value:                
-                protein_props["primary_protein_name"] = self._ensure_iterable(all_props[k])[0] if all_props[k] else None
+
+            if k == UniprotNodeField.PROTEIN_NAMES.value:
+                protein_props["primary_protein_name"] = (
+                    self._ensure_iterable(all_props[k])[0] if all_props[k] else None
+                )
 
             # replace hyphens and spaces with underscore
             protein_props[k.replace(" ", "_").replace("-", "_")] = all_props[k]
@@ -507,9 +502,7 @@ class Uniprot:
         """
         if field_value:
             # replace sensitive elements for admin-import
-            field_value = (
-                field_value.replace("|", ",").replace("'", "^").strip()
-            )
+            field_value = field_value.replace("|", ",").replace("'", "^").strip()
 
             # define fields that will not be splitted by semicolon
             split_dict = {
@@ -563,9 +556,7 @@ class Uniprot:
         if "[Cleaved" in field_value:
             # discarding part after the "[Cleaved"
             clip_index = field_value.index("[Cleaved")
-            protein_names = (
-                field_value[:clip_index].replace("(Fragment)", "").strip()
-            )
+            protein_names = field_value[:clip_index].replace("(Fragment)", "").strip()
 
             # handling multiple protein names
             if "(EC" in protein_names[0]:
@@ -587,9 +578,7 @@ class Uniprot:
         elif "[Includes" in field_value:
             # discarding part after the "[Includes"
             clip_index = field_value.index("[Includes")
-            protein_names = (
-                field_value[:clip_index].replace("(Fragment)", "").strip()
-            )
+            protein_names = field_value[:clip_index].replace("(Fragment)", "").strip()
             # handling multiple protein names
             if "(EC" in protein_names[0]:
 
@@ -650,9 +639,7 @@ class Uniprot:
                     )
             else:
                 virus_hosts_tax_ids = (
-                    field_value[
-                        field_value.index("[") + 1 : field_value.index("]")
-                    ]
+                    field_value[field_value.index("[") + 1 : field_value.index("]")]
                     .split(":")[1]
                     .strip()
                 )
@@ -677,9 +664,7 @@ class Uniprot:
         ensg_ids = set()
         for enst_id in enst_list:
             ensg_id = list(
-                mapping.map_name(
-                    enst_id.split(".")[0], "enst_biomart", "ensg_biomart"
-                )
+                mapping.map_name(enst_id.split(".")[0], "enst_biomart", "ensg_biomart")
             )
             ensg_id = ensg_id[0] if ensg_id else None
             if ensg_id:
@@ -742,7 +727,7 @@ class Uniprot:
         self.organism_properties = [UniprotNodeField.PROTEIN_ORGANISM.value]
 
     def _set_node_and_edge_fields(
-        self, node_types, node_fields#, edge_types, edge_fields
+        self, node_types, node_fields  # , edge_types, edge_fields
     ):
 
         # ensure computation of ENSGs
