@@ -1,3 +1,8 @@
+# Big files
+data/Stitch/
+data/mapping_tables/metmap_curated.csv
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
