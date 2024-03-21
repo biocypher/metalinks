@@ -3,6 +3,9 @@ import io
 import pstats
 from biocypher import BioCypher
 
+import os
+import requests
+
 from metalinks.adapters.hmdb_adapter import (
     HMDBAdapter,
     HMDBEdgeType,
@@ -15,6 +18,8 @@ from metalinks.adapters.stitch_adapter import (
     STITCHAdapter,
     STITCHEdgeType,
     STITCHMetaboliteToProteinEdgeField,
+    ACTIONS_PATH,
+    DETAILS_PATH
 )
 
 from metalinks.adapters.uniprot_metalinks import (
@@ -27,6 +32,7 @@ from metalinks.adapters.recon_adapter import (
     ReconAdapter,
     ReconEdgeType,
     ReconMetaboliteToProteinEdgeField,
+    METMAP_PATH
 )
 
 from metalinks.adapters.hmr_adapter import (
@@ -56,7 +62,6 @@ hmdb_node_types = [
 
 uniprot_node_types = [
     UniprotNodeType.PROTEIN,
-    # UniprotNodeType.CELLULAR_COMPARTMENT        ,
 ]
 
 hmdb_node_fields = [
@@ -184,6 +189,38 @@ neuronchat_edge_fields = [
 ]
 
 
+def download_files(file_mappings):
+    """
+    Download cached files from Zenodo and store them in the given paths.
+
+    Parameters
+        file_mappings: A dictionary where keys are URLs and values are the local file paths to store the downloaded files.
+    """
+    for url, path in file_mappings.items():
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+
+        # Skip downloading if the file already exists
+        if os.path.exists(path):
+            print(f"File already exists: {path}")
+            continue
+
+        # Download the file
+        response = requests.get(url, allow_redirects=True)
+        if response.status_code == 200:
+            with open(path, 'wb') as file:
+                file.write(response.content)
+            print(f"Downloaded and saved: {path}")
+        else:
+            print(f"Failed to download {url}")
+
+# Define the mappings of URLs to local storage paths
+file_mappings = {
+    "https://zenodo.org/records/10200150/files/9606.actions.v5.0.tsv?download=1": ACTIONS_PATH,
+    "https://zenodo.org/records/10200150/files/9606.protein_chemical.links.detailed.v5.0.tsv?download=1": DETAILS_PATH,
+    "https://zenodo.org/records/10200150/files/metmap_curated.csv?download=1": METMAP_PATH
+}
+
 def main():
     """
     Connect BioCypher to HMDB adapter to import data into Neo4j.
@@ -197,6 +234,9 @@ def main():
     ###############
     # ACTUAL CODE #
     ###############
+    
+    # download cached files
+    download_files(file_mappings)
 
     bc = BioCypher(
         biocypher_config_path="config/biocypher_config.yaml",
