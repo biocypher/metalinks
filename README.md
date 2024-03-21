@@ -20,6 +20,13 @@ cd metalinks
 poetry install
 ```
 
+or
+
+```bash 
+conda env create -f env.yml
+conda activate metalinks
+```
+
 <!-- TODO rest -->
 
 All additional files and a webpage dump can be found here:

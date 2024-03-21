@@ -297,7 +297,7 @@ class Uniprot:
 
                     self.data[arg][protein] = individual_protein_locations
 
-    def get_nodes(self, ligand_or_receptor: bool = False):
+    def get_nodes(self):
         """
         Yield nodes (protein, gene, organism) from UniProt data.
         """

@@ -15,6 +15,9 @@ from biocypher._logger import logger
 
 logger.debug(f"Loading module {__name__}.")
 
+DETAILS_PATH = 'data/Stitch/9606.protein_chemical.links.detailed.v5.0.tsv'
+ACTIONS_PATH = 'data/Stitch/9606.actions.v5.0.tsv'
+
 class STITCHEdgeType(Enum):
     """
     STITCH edge types.
@@ -63,12 +66,8 @@ class STITCHAdapter:
         """
 
         print( 'Getting MR connections from STITCH... ')
-              
-        # prepare stitch data
-        details_path = '/Users/ef6/Documents/Saez/Data/Source/Stitch/9606.protein_chemical.links.detailed.v5.0.tsv' # can be dowloaded here: https://zenodo.org/records/10200150 or the stitch website: http://stitch.embl.de/cgi/download.pl?UserId=n5QdzJfmvzSj&sessionId=5nq4BYfHQNmU
-        actions_path = '/Users/ef6/Documents/Saez/Data/Source/Stitch/9606.actions.v5.0.tsv'
 
-        actions = pl.scan_csv(actions_path, separator='\t')
+        actions = pl.scan_csv(ACTIONS_PATH, separator='\t')
         flipped = actions.filter(pl.col('item_id_a').str.contains('9606')).select(['item_id_b', 'item_id_a', 'mode'])
         df1 = flipped.collect()
         df1 = df1.rename({'item_id_a': 'protein', 'item_id_b': 'chemical', 'mode': 'mode'})
@@ -78,7 +77,7 @@ class STITCHAdapter:
         df2 = df2.rename({'item_id_a': 'chemical', 'item_id_b': 'protein', 'mode': 'mode'})
         df = pl.concat([df1, df2], how='vertical')
 
-        details = pl.scan_csv(details_path, separator='\t')
+        details = pl.scan_csv(DETAILS_PATH, separator='\t')
         data = details.collect()
 
         interactions = data.join(df, on=['chemical', 'protein'], how='left')

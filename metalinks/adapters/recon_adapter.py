@@ -19,6 +19,8 @@ from biocypher._logger import logger
 
 logger.debug(f"Loading module {__name__}.")
 
+METMAP_PATH = 'data/mapping_tables/metmap_curated.csv'
+
 class ReconEdgeType(Enum):
     """
     RECON edge types.
@@ -70,9 +72,7 @@ class ReconAdapter:
         recon_symbols_path = 'data/recon_gene_symbols.csv'
 
         map1_path = 'data/mapping_tables/global_ID_mapping_curated.tsv'
-        map2_path = '/Users/ef6/Documents/Saez/metalinks/Data/Intermediate/Mapping/metmap_curated.csv' # can be obtained here: https://zenodo.org/records/10200150
         map3_path = 'data/mapping_tables/hmdb_mapping.csv'
-        
 
         recon = sio.loadmat(recon_path)
         symbols = pd.read_csv(recon_symbols_path, sep=';')
@@ -134,7 +134,7 @@ class ReconAdapter:
         print(f'collapsed metabolites to genes, now have {len(metabolite_to_gene)} metabolite to gene links')
 
         metmap1 = pd.read_csv(map1_path, sep='\t', dtype=object)
-        metmap2 = pd.read_csv(map2_path, sep='\t', dtype=str)
+        metmap2 = pd.read_csv(METMAP_PATH, sep='\t', dtype=str)
         metmap3 = pd.read_csv(map3_path, sep=',', dtype=str)
 
         field_names = ['metPubChemID',  'metHMDBID', 'metKEGGID', 'metCHEBIID',  'mets']
