@@ -41,6 +41,12 @@ from metalinks.adapters.hmr_adapter import (
     HmrMetaboliteToProteinEdgeField,
 )
 
+from metalinks.adapters.rhea_adapter import (
+    RheaAdapter,
+    RheaEdgeType,
+    RheaMetaboliteToProteinEdgeField,
+)
+
 from metalinks.adapters.cellphone_metabolites_adapter import (
     CellphoneAdapter,
     CellphoneEdgeType,
@@ -52,6 +58,12 @@ from metalinks.adapters.neuronchat_adapter import (
     NeuronchatAdapter,
     NeuronchatEdgeType,
     NeuronchatMetaboliteToProteinEdgeField,
+)
+
+from metalinks.adapters.cellinker_metabolites_adapter import (
+    CellinkerAdapter,
+    CellinkerEdgeType,
+    CellinkerMetaboliteToProteinEdgeField,
 )
 
 PROFILE = False
@@ -117,12 +129,20 @@ hmr_edge_types = [
     HmrEdgeType.PD_hmr,
 ]
 
+rhea_edge_types = [
+    RheaEdgeType.PD_rhea,
+]
+
 cellphone_edge_types = [
     CellphoneEdgeType.CP,
 ]
 
 neuronchat_edge_types = [
     NeuronchatEdgeType.NC,
+]
+
+cellinker_edge_types = [
+    CellinkerEdgeType.CL,
 ]
 
 
@@ -174,6 +194,18 @@ hmr_edge_fields = [
     HmrMetaboliteToProteinEdgeField.REV,
 ]
 
+rhea_edge_fields = [
+    RheaMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
+    RheaMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
+    RheaMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
+    RheaMetaboliteToProteinEdgeField.DIRECTION,
+    # RheaMetaboliteToProteinEdgeField.STATUS,
+    # RheaMetaboliteToProteinEdgeField.SUBSYSTEM,
+    # RheaMetaboliteToProteinEdgeField.TRANSPORT,
+    # RheaMetaboliteToProteinEdgeField.TRANSPORT_DIRECTION,
+    # RheaMetaboliteToProteinEdgeField.REV,
+]
+
 cellphone_edge_fields = [
     CellphoneMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
     CellphoneMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
@@ -186,6 +218,13 @@ neuronchat_edge_fields = [
     NeuronchatMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
     NeuronchatMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
     NeuronchatMetaboliteToProteinEdgeField.MODE,
+]
+
+cellinker_edge_fields = [
+    CellinkerMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
+    CellinkerMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
+    CellinkerMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
+    CellinkerMetaboliteToProteinEdgeField.MODE,
 ]
 
 
@@ -285,6 +324,12 @@ def main():
         test_mode=True,
     )
 
+    RHEA = RheaAdapter(
+        edge_types=rhea_edge_types,
+        edge_fields=rhea_edge_fields,
+        test_mode=True,
+    )
+
     CELLPHONE = CellphoneAdapter(
         edge_types=cellphone_edge_types,
         edge_fields=cellphone_edge_fields,
@@ -297,15 +342,23 @@ def main():
         test_mode=True,
     )
 
+    CELLINKER = CellinkerAdapter(
+        edge_types=cellinker_edge_types,
+        edge_fields=cellinker_edge_fields,
+        test_mode=True,
+    )
+
     # write nodes and edges to csv
-    bc.write_nodes(UNIPROT.get_nodes())
-    bc.write_nodes(HMDB.get_nodes())
     bc.write_edges(CELLPHONE.get_edges())
     bc.write_edges(NEURONCHAT.get_edges())
+    bc.write_edges(CELLINKER.get_edges())
     bc.write_edges(STITCH.get_edges())  # high RAM, thus attention at the beginning
     bc.write_edges(RECON.get_edges())
     bc.write_edges(HMR.get_edges())
+    bc.write_edges(RHEA.get_edges())
     bc.write_edges(HMDB.get_edges())
+    bc.write_nodes(UNIPROT.get_nodes())
+    bc.write_nodes(HMDB.get_nodes())
 
     # convenience and stats
     bc.write_import_call()

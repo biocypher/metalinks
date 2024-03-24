@@ -91,6 +91,20 @@ hmr production degradation:
     transport_direction: str
     rev: str
 
+rhea production degradation:
+  is_a: association
+  represented_as: edge
+  source: small molecule
+  target: protein
+  label_in_input: PD_rhea
+  properties:
+    status: str
+    direction: str
+    # subsystem: str
+    # transport: str
+    # transport_direction: str
+    # rev: str
+
 
 stitch metabolite receptor:
   is_a: association
@@ -121,6 +135,15 @@ neuronchat metabolite receptor:
   source: small molecule
   target: protein
   label_in_input: NC
+  properties:
+      mode: str
+
+cellinker metabolite receptor:
+  is_a: association
+  represented_as: edge
+  source: small molecule
+  target: protein
+  label_in_input: CL
   properties:
       mode: str
 

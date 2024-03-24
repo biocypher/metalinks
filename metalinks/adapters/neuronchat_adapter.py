@@ -77,7 +77,6 @@ class NeuronchatAdapter:
 
         for row in ncdb_cut.iterrows():
             if row[1]['uniprot'] == set():
-                print(row)
                 continue
             attributes  = {
                 'mode': 'activation'
