@@ -1,0 +1,15 @@
+# use this biocypher config, if you want to have a sqlite output
+
+biocypher:
+  offline: true
+  debug: false
+  dbms: sqlite
+  head_ontology:
+    url: https://github.com/biolink/biolink-model/raw/v3.2.1/biolink-model.owl.ttl
+    root_node: entity
+  schema_config_path: config/schema_config.yaml
+
+sqlite:
+  database_name: metalinks.db
+  quote_character: '"'
+  delimiter: '\t'
