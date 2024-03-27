@@ -27,6 +27,11 @@ conda env create -f env.yml
 conda activate metalinks
 ```
 
+To create the knowledge graph, run the following within the created environment:
+```bash 
+python create_knowledge_graph.py
+```
+
 <!-- TODO rest -->
 
 All additional files and a webpage dump can be found here:
