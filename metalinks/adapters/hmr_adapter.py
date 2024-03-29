@@ -132,6 +132,7 @@ class HmrAdapter:
 
         uniprot_dict = dict(zip(uniprot_df['genesymbol'], uniprot_df['uniprot']))
         metabolite_to_gene['uniprot'] = metabolite_to_gene['gene_id'].map(uniprot_dict)
+        print(f'{metabolite_to_gene["uniprot"].isna().sum()} uniprot ids are missing')
         metabolite_to_gene.dropna(subset=['uniprot'], inplace=True)
         metabolite_to_gene['uniprot'] = metabolite_to_gene['uniprot'].apply(lambda x: 'uniprot:' + x if x is not np.nan else x)
 
@@ -202,12 +203,12 @@ def get_hmdb_ids_s(df, metmap3):
     df.drop_duplicates(inplace=True)
     return df
 
-def symbol_to_uniprot(ensp_list):
-    gene_symbol_list = []
-    for element in ensp_list:
-        symbol = mapping.map_name(str(element), 'genesymbol', 'uniprot')
-        if symbol != set():
-            gene_symbol_list.append(symbol.pop())
-        else:
-            gene_symbol_list.append('NA')
-    return gene_symbol_list
+# def symbol_to_uniprot(ensp_list):
+#     gene_symbol_list = []
+#     for element in ensp_list:
+#         symbol = mapping.map_name(str(element), 'genesymbol', 'uniprot')
+#         if symbol != set():
+#             gene_symbol_list.append(symbol.pop())
+#         else:
+#             gene_symbol_list.append('NA')
+#     return gene_symbol_list

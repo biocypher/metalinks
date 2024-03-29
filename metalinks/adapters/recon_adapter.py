@@ -71,7 +71,6 @@ class ReconAdapter:
         recon_path = 'data/Recon3D_301.mat'
         recon_symbols_path = 'data/recon_gene_symbols.csv'
 
-        map1_path = 'data/mapping_tables/global_ID_mapping_curated.tsv'
         map3_path = 'data/mapping_tables/hmdb_mapping.csv'
 
         recon = sio.loadmat(recon_path)
@@ -133,9 +132,8 @@ class ReconAdapter:
 
         print(f'collapsed metabolites to genes, now have {len(metabolite_to_gene)} metabolite to gene links')
 
-        metmap1 = pd.read_csv(map1_path, sep='\t', dtype=object)
-        metmap2 = pd.read_csv(METMAP_PATH, sep='\t', dtype=str)
-        metmap3 = pd.read_csv(map3_path, sep=',', dtype=str)
+        metmap1 = pd.read_csv(METMAP_PATH, sep='\t', dtype=str)
+        metmap2 = pd.read_csv(map3_path, sep=',', dtype=str)
 
         field_names = ['metPubChemID',  'metHMDBID', 'metKEGGID', 'metCHEBIID',  'mets']
 
@@ -152,9 +150,9 @@ class ReconAdapter:
 
         print(f'loaded metabolite mapping files')
 
-        dfs = preprocess_metmaps(df, metmap1, metmap2, metmap3)
+        dfs = preprocess_metmaps(df, metmap1, metmap2)
 
-        test = fill_missing_values(df1=dfs[0], df2=dfs[3], df3=dfs[1])
+        test = fill_missing_values(df1=dfs[0], df2=dfs[2], df3=dfs[1])
         test = fill_missing_values(test[0], test[1], test[2], 'kegg_id', 'chebi_id', 'hmdb_id', 'pubchem_id')
         test = fill_missing_values(test[0], test[1], test[2], 'hmdb_id', 'chebi_id', 'kegg_id', 'pubchem_id')
         test = fill_missing_values(test[0], test[1], test[2], 'pubchem_id', 'chebi_id', 'kegg_id', 'hmdb_id')
@@ -174,6 +172,8 @@ class ReconAdapter:
 
         uniprot_dict = dict(zip(uniprot_df['genesymbol'], uniprot_df['uniprot']))
         metabolite_to_gene['uniprot'] = metabolite_to_gene['gene_id'].map(uniprot_dict)
+        # print how many uniprot ids are missing
+        print(f'{metabolite_to_gene["uniprot"].isna().sum()} uniprot ids are missing')
         metabolite_to_gene.dropna(subset=['uniprot'], inplace=True)
         metabolite_to_gene['uniprot'] = metabolite_to_gene['uniprot'].apply(lambda x: 'uniprot:' + x if x is not np.nan else x)
 
@@ -259,8 +259,8 @@ def fill_missing_values(df1, df2, df3, str1 = 'chebi_id', str2 = 'kegg_id', str3
     return df1, df2, df3
 
 
-def get_hmdb_ids_s(df, metmap3):
-    df = df.merge(metmap3, on='pubchem_id', how='left')
+def get_hmdb_ids_s(df, metmap2):
+    df = df.merge(metmap2, on='pubchem_id', how='left')
     df.drop_duplicates(inplace=True)
     return df
 
@@ -276,19 +276,18 @@ def drop_nan(df, col1, col2, col3):
     return df
 
 
-def preprocess_metmaps(df, metmap1, metmap2, metmap3):
-    metmap2.rename(columns={'CID': 'pubchem_id', 'KEGG' : 'kegg_id', 'HMDB' : 'hmdb_id', 'ChEBI' : 'chebi_id'}, inplace=True)
-    metmap2['chebi_id'] = 'CHEBI:' + metmap2['chebi_id']
+def preprocess_metmaps(df, metmap1, metmap2):
+    metmap1.rename(columns={'CID': 'pubchem_id', 'KEGG' : 'kegg_id', 'HMDB' : 'hmdb_id', 'ChEBI' : 'chebi_id'}, inplace=True)
+    metmap1['chebi_id'] = 'CHEBI:' + metmap1['chebi_id']
     df.rename(columns={'metCHEBIID': 'chebi_id', 'metKEGGID': 'kegg_id', 'metHMDBID': 'hmdb_id', 'metPubChemID': 'pubchem_id'}, inplace=True)
-    metmap1['pubchem_id'] = metmap1['pubchem_id'].apply(lambda x: str(int(x)) if not pd.isnull(x) else x)
     df['chebi_id'] = df['chebi_id'].apply(lambda x: 'CHEBI:' + x if not pd.isnull(x) and not x.startswith('CHEBI:') else x)
 
     df['kegg_id'] = df['kegg_id'].apply(lambda x: x[x.find('C'):x.find('C')+6] if not pd.isnull(x) else x)
-    metmap2['kegg_id'] = metmap2['kegg_id'].apply(lambda x: x[x.find('C'):x.find('C')+6] if not pd.isnull(x) else x)
-    metmap2['hmdb_id'] = metmap2['hmdb_id'].astype(str)
-    metmap2['hmdb_id'] = metmap2['hmdb_id'].apply(lambda x: x if len(x) == 11 else x[:4] + '0'*(11-len(x)) + x[4:])
-    metmap2['hmdb_id'] = metmap2['hmdb_id'].apply(lambda x: np.nan if x.startswith('nan') else x)
-    metmap2['hmdb_id'].str.len().value_counts()
+    metmap1['kegg_id'] = metmap1['kegg_id'].apply(lambda x: x[x.find('C'):x.find('C')+6] if not pd.isnull(x) else x)
+    metmap1['hmdb_id'] = metmap1['hmdb_id'].astype(str)
+    metmap1['hmdb_id'] = metmap1['hmdb_id'].apply(lambda x: x if len(x) == 11 else x[:4] + '0'*(11-len(x)) + x[4:])
+    metmap1['hmdb_id'] = metmap1['hmdb_id'].apply(lambda x: np.nan if x.startswith('nan') else x)
+    metmap1['hmdb_id'].str.len().value_counts()
 
 
     df['hmdb_id'] = df['hmdb_id'].astype(str)
@@ -296,15 +295,14 @@ def preprocess_metmaps(df, metmap1, metmap2, metmap3):
     df['hmdb_id'] = df['hmdb_id'].apply(lambda x: np.nan if x.startswith('nan') else x)
     df['hmdb_id'].str.len().value_counts()
 
-    metmap3.rename(columns={'accession': 'hmdb_id'}, inplace=True)
-    metmap3['chebi_id'] = metmap3['chebi_id'].apply(lambda x: 'CHEBI:' + x if not pd.isnull(x) else x)
+    metmap2.rename(columns={'accession': 'hmdb_id'}, inplace=True)
+    metmap2['chebi_id'] = metmap2['chebi_id'].apply(lambda x: 'CHEBI:' + x if not pd.isnull(x) else x)
 
     df1 = df[['chebi_id', 'kegg_id', 'hmdb_id', 'pubchem_id']]
-    df2 = metmap1[['chebi_id', 'kegg_id', 'hmdb_id', 'pubchem_id']]
-    df3 = metmap2[['chebi_id', 'kegg_id', 'hmdb_id', 'pubchem_id']]
-    df4 = metmap3[['chebi_id', 'kegg_id', 'hmdb_id', 'pubchem_id']]
+    df3 = metmap1[['chebi_id', 'kegg_id', 'hmdb_id', 'pubchem_id']]
+    df4 = metmap2[['chebi_id', 'kegg_id', 'hmdb_id', 'pubchem_id']]
 
-    return df1, df2, df3, df4
+    return df1, df3, df4
 
 
 def fillna_with_map(df, str1, str2, str3, str4, dict1, dict2, dict3):
@@ -356,12 +354,12 @@ def create_dict(df, list_of_columns):
 
 
 
-def symbol_to_uniprot(ensp_list):
-    gene_symbol_list = []
-    for element in ensp_list:
-        symbol = mapping.map_name(str(element), 'genesymbol', 'uniprot')
-        if symbol != set():
-            gene_symbol_list.append(symbol.pop())
-        else:
-            gene_symbol_list.append('NA')
-    return gene_symbol_list
+# def symbol_to_uniprot(ensp_list):
+#     gene_symbol_list = []
+#     for element in ensp_list:
+#         symbol = mapping.map_name(str(element), 'genesymbol', 'uniprot')
+#         if symbol != set():
+#             gene_symbol_list.append(symbol.pop())
+#         else:
+#             gene_symbol_list.append('NA')
+#     return gene_symbol_list

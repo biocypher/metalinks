@@ -72,12 +72,17 @@ class NeuronchatAdapter:
 
         ncdb_cut['gene']    = ncdb_cut['interaction_name'].str.split('_').str[1]
         ncdb_cut['uniprot'] = ncdb_cut['gene'].apply(lambda x: mapping.map_name(x, 'genesymbol', 'uniprot'))
-        
+
+
+        missing_symbols = pd.read_csv('data/mapping_tables/missing_symbols.csv')
+        missing_symbols_dict = dict(zip(missing_symbols['symbol'], missing_symbols['uniprot']))
 
 
         for row in ncdb_cut.iterrows():
             if row[1]['uniprot'] == set():
-                continue
+                row[1]['uniprot'] = [missing_symbols_dict[row[1]['gene']]]
+                if row[1]['uniprot'] == 'nan':
+                    print('missing uniprot for', row[1]['symbol'])
             attributes  = {
                 'mode': 'activation'
             }

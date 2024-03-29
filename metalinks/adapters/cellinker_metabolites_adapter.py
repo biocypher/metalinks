@@ -78,7 +78,7 @@ class CellinkerAdapter:
         
         for row in cellinker.iterrows():
             if row[1]['uniprot'] == set():
-                print(row)
+                print(row[1]['Receptor_symbol'])
                 continue
             attributes  = {
                 'mode': 'activation'

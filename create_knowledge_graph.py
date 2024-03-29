@@ -349,7 +349,6 @@ def main():
     )
 
     # write nodes and edges to csv
-    bc.write_nodes(UNIPROT.get_nodes())
     bc.write_nodes(HMDB.get_nodes())
     bc.write_edges(CELLPHONE.get_edges())
     bc.write_edges(NEURONCHAT.get_edges())
@@ -359,6 +358,8 @@ def main():
     bc.write_edges(HMR.get_edges())
     bc.write_edges(RHEA.get_edges())
     bc.write_edges(HMDB.get_edges())
+    bc.write_nodes(UNIPROT.get_nodes())
+
 
     # convenience and stats
     bc.write_import_call()

@@ -13,7 +13,6 @@ import hashlib
 from tqdm import tqdm
 import numpy as np
 import scipy.io as sio
-from pypath.utils import mapping
 
 from biocypher._logger import logger
 

@@ -63,10 +63,14 @@ class CellphoneAdapter:
         cpdb['symbol'] = cpdb['protein_name_b'].str.split('_').str[0]
         cpdb['uniprot'] = cpdb['symbol'].apply(lambda x: mapping.map_name(x, 'genesymbol', 'uniprot'))
 
+        missing_symbols = pd.read_csv('data/mapping_tables/missing_symbols.csv')
+        missing_symbols_dict = dict(zip(missing_symbols['symbol'], missing_symbols['uniprot']))
+
         for row in cpdb.iterrows():
             if row[1]['uniprot'] == set():
-                print(row)
-                continue
+                row[1]['uniprot'] = [missing_symbols_dict[row[1]['symbol']]]
+                if row[1]['uniprot'] == 'nan':
+                    print('missing uniprot for', row[1]['symbol'])
             attributes  = {
                 'mode': 'activation'
             }
