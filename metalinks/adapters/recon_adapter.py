@@ -68,8 +68,8 @@ class ReconAdapter:
         Get edges from RECON.
         """
 
-        recon_path = 'data/Recon3D_301.mat'
-        recon_symbols_path = 'data/recon_gene_symbols.csv'
+        recon_path = 'data/Recon3D/Recon3D_301.mat'
+        recon_symbols_path = 'data/Recon3D/recon_gene_symbols.csv'
 
         map3_path = 'data/mapping_tables/hmdb_mapping.csv'
 
@@ -176,6 +176,8 @@ class ReconAdapter:
         print(f'{metabolite_to_gene["uniprot"].isna().sum()} uniprot ids are missing')
         metabolite_to_gene.dropna(subset=['uniprot'], inplace=True)
         metabolite_to_gene['uniprot'] = metabolite_to_gene['uniprot'].apply(lambda x: 'uniprot:' + x if x is not np.nan else x)
+
+        metabolite_to_gene.drop_duplicates(subset=['hmdb_id', 'uniprot'], inplace=True)
 
         for row in tqdm(metabolite_to_gene.iterrows()):
             attributes  = {

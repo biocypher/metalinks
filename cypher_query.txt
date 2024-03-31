@@ -49,15 +49,15 @@ AND ANY(value in m.cellular_locations WHERE value = 'Extracellular')
 AND ((p.receptor_type in ['catalytic_receptor', 'gpcr', 'nhr']) OR ((p.receptor_type in ['lgic',  'other_ic', 'transporter', 'vgic'] AND a.mode in ['activation', 'binding'])))
 AND NOT a.mode in ['reaction', 'catalysis', 'expression', 'pred_binding']
 RETURN 
-  m.id as hmdb,
+  m.id as HMDB,
   m.name as metabolite,
   p.symbol as Symbol,
   p.id as Uniprot,
   p.protein_names as ProtName,
   m.pubchem_compound_id as pubchem,
-  m.cellular_locations as cell_location,
-  m.tissue_locations as tissue_location,
-  m.biospecimen_locations as biospecimen_location,
+  m.cellular_locations as CellLoc,
+  m.tissue_locations as TissueLoc,
+  m.biospecimen_locations as BSLoc,
   m.sub_class as metabolite_subclass,
   a.combined_score,
   a.experiment,

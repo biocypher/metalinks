@@ -136,6 +136,8 @@ class HmrAdapter:
         metabolite_to_gene.dropna(subset=['uniprot'], inplace=True)
         metabolite_to_gene['uniprot'] = metabolite_to_gene['uniprot'].apply(lambda x: 'uniprot:' + x if x is not np.nan else x)
 
+        metabolite_to_gene.drop_duplicates(subset=['hmdb_id', 'uniprot'], inplace=True)
+
 
         for row in tqdm(metabolite_to_gene.iterrows()):
             attributes  = {

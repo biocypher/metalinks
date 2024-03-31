@@ -147,4 +147,13 @@ cellinker metabolite receptor:
   properties:
       mode: str
 
+scconnect metabolite receptor:
+  is_a: association
+  represented_as: edge
+  source: small molecule
+  target: protein
+  label_in_input: SCC
+  properties:
+      mode: str
+
 

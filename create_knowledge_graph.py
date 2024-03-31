@@ -66,6 +66,12 @@ from metalinks.adapters.cellinker_metabolites_adapter import (
     CellinkerMetaboliteToProteinEdgeField,
 )
 
+from metalinks.adapters.scconnect_adapter import (
+    ScconnectAdapter,
+    ScconnectEdgeType,
+    ScconnectMetaboliteToProteinEdgeField,
+)
+
 PROFILE = False
 
 hmdb_node_types = [
@@ -143,6 +149,10 @@ neuronchat_edge_types = [
 
 cellinker_edge_types = [
     CellinkerEdgeType.CL,
+]
+
+scconnect_edge_types = [
+    ScconnectEdgeType.SCC,
 ]
 
 
@@ -225,6 +235,13 @@ cellinker_edge_fields = [
     CellinkerMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
     CellinkerMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
     CellinkerMetaboliteToProteinEdgeField.MODE,
+]
+
+scconnect_edge_fields = [
+    ScconnectMetaboliteToProteinEdgeField._PRIMARY_SOURCE_ID,
+    ScconnectMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
+    ScconnectMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
+    ScconnectMetaboliteToProteinEdgeField.MODE,
 ]
 
 
@@ -348,17 +365,26 @@ def main():
         test_mode=True,
     )
 
+    SCCONNECT = ScconnectAdapter(
+        edge_types=scconnect_edge_types,
+        edge_fields=scconnect_edge_fields,
+        test_mode=True,
+    )
+
     # write nodes and edges to csv
+
     bc.write_nodes(HMDB.get_nodes())
     bc.write_edges(CELLPHONE.get_edges())
     bc.write_edges(NEURONCHAT.get_edges())
     bc.write_edges(CELLINKER.get_edges())
+    bc.write_edges(SCCONNECT.get_edges())
     bc.write_edges(STITCH.get_edges())  # high RAM, thus attention at the beginning
     bc.write_edges(RECON.get_edges())
     bc.write_edges(HMR.get_edges())
     bc.write_edges(RHEA.get_edges())
     bc.write_edges(HMDB.get_edges())
     bc.write_nodes(UNIPROT.get_nodes())
+    
 
 
     # convenience and stats

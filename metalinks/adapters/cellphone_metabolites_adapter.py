@@ -59,18 +59,22 @@ class CellphoneAdapter:
         Get edges from Cellphone (curated file)
         """
 
-        cpdb = pd.read_excel('data/Cellphone_suptab4_curated.xlsx')
+        cpdb = pd.read_excel('data/CellphoneDB/Cellphone_suptab4_curated.xlsx')
         cpdb['symbol'] = cpdb['protein_name_b'].str.split('_').str[0]
         cpdb['uniprot'] = cpdb['symbol'].apply(lambda x: mapping.map_name(x, 'genesymbol', 'uniprot'))
+
+        cpdb.dropna(subset=['symbol', 'Chebi/HMDB_name_a'], inplace=True)
 
         missing_symbols = pd.read_csv('data/mapping_tables/missing_symbols.csv')
         missing_symbols_dict = dict(zip(missing_symbols['symbol'], missing_symbols['uniprot']))
 
         for row in cpdb.iterrows():
             if row[1]['uniprot'] == set():
-                row[1]['uniprot'] = [missing_symbols_dict[row[1]['symbol']]]
-                if row[1]['uniprot'] == 'nan':
-                    print('missing uniprot for', row[1]['symbol'])
+                try:
+                    row[1]['uniprot'] = [missing_symbols_dict[row[1]['symbol']]]
+                except:
+                    print(f"Symbol {row[1]['symbol']} not found in mapping tables.")
+                    continue
             attributes  = {
                 'mode': 'activation'
             }

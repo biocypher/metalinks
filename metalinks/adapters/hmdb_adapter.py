@@ -155,7 +155,7 @@ class HMDBAdapter:
 
         print(  "Getting edges"  )
 
-        reactions_path = 'data/hmdb_reactions_full_status.csv'
+        reactions_path = 'data/HMDB/hmdb_reactions_full_status.csv'
         reactions = read_csv(reactions_path, sep=',')
         reactions['HMDBP'] = reactions['HMDBP'].apply(lambda x: id_conversion[x] if x in id_conversion else None)
         reactions.rename(columns={'HMDBP': 'uniprot'}, inplace=True)
@@ -170,8 +170,8 @@ class HMDBAdapter:
         reactions['reaction_id'] = reactions.apply(lambda x: hashlib.md5(str(x).encode('utf-8')).hexdigest(), axis=1)
         reactions = reactions[['reaction_id'] + [col for col in reactions.columns if col != 'reaction_id']]
 
-        
-        
+        # replace values in direction; 'Reactand' -> 'degrading', 'Product' -> 'producing'
+        reactions['direction'] = reactions['direction'].replace({'Reactand': 'degrading', 'Product': 'producing'})
         
         for index in range(len(reactions)):
             attributes = reactions.iloc[index, 3:].to_dict()

@@ -58,7 +58,7 @@ class NeuronchatAdapter:
         """
         Get edges from Neuronchat (curated file)
         """
-        neuronchat_path = 'data/NeuronChatDB_human.csv'
+        neuronchat_path = 'data/NeuronChat/NeuronChatDB_human.csv'
         neuronchat_table_path = 'data/mapping_tables/Neuronchat_table.csv'
 
         ncdb                = pd.read_csv(neuronchat_table_path, sep=',')
@@ -73,16 +73,16 @@ class NeuronchatAdapter:
         ncdb_cut['gene']    = ncdb_cut['interaction_name'].str.split('_').str[1]
         ncdb_cut['uniprot'] = ncdb_cut['gene'].apply(lambda x: mapping.map_name(x, 'genesymbol', 'uniprot'))
 
-
         missing_symbols = pd.read_csv('data/mapping_tables/missing_symbols.csv')
         missing_symbols_dict = dict(zip(missing_symbols['symbol'], missing_symbols['uniprot']))
 
-
         for row in ncdb_cut.iterrows():
             if row[1]['uniprot'] == set():
-                row[1]['uniprot'] = [missing_symbols_dict[row[1]['gene']]]
-                if row[1]['uniprot'] == 'nan':
-                    print('missing uniprot for', row[1]['symbol'])
+                try:
+                    row[1]['uniprot'] = [missing_symbols_dict[row[1]['gene']]]
+                except:
+                    print(f"Symbol {row[1]['gene']} not found in mapping tables.")
+                    continue
             attributes  = {
                 'mode': 'activation'
             }

@@ -96,6 +96,9 @@ class RheaAdapter:
 
         rhea['uniprot'] = 'uniprot:' + rhea['ID']
 
+        rhea.drop_duplicates(subset=['HMDB', 'uniprot'], inplace=True)
+
+
         for row in tqdm(rhea.iterrows()):
             attributes  = {
                 'status': 'rhea',

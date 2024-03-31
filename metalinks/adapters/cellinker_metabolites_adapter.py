@@ -58,7 +58,7 @@ class CellinkerAdapter:
         """
         Get edges from Cellinker (curated file)
         """
-        cellinker_path = 'data/human-sMOL.txt'
+        cellinker_path = 'data/Cellinker/human-sMOL.txt'
         hmdb_mapping = 'data/mapping_tables/hmdb_mapping.csv'
         
         cellinker = pd.read_csv(cellinker_path, sep='\t')
