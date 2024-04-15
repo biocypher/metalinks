@@ -67,16 +67,15 @@ RETURN
   m.diseases as disease,
   m.pathways as pathway
 
-# PD_0.4.1
+# PD_0.4.5
 
 MATCH (m)-[a]->(p:Protein)
-WHERE type(a) in ['ReconProductionDegradation','HMDBProductionDegradation', 'HmrProductionDegradation', 'RheaProductionDegradation']  
-AND ANY(value in m.cellular_locations WHERE value = 'Extracellular') 
+WHERE type(a) in ['ReconProductionDegradation','HmdbProductionDegradation', 'HmrProductionDegradation', 'RheaProductionDegradation']  
 AND NOT (a.transport_direction = 'out' AND a.direction = 'degradation')
 RETURN 
   m.id as HMDB,
        m.name as MetName,
-       symbol as Symbol,
+       m.symbol as Symbol,
        m.cellular_locations as CellLoc,
        m.tissue_locations as TissueLoc,
        m.biospecimen_locations as BiospecLoc,
