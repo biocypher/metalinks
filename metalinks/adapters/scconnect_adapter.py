@@ -62,7 +62,7 @@ class ScconnectAdapter:
         scc_lig_path = 'data/scConnect/ligands.csv'
         hmdb_path = 'data/mapping_tables/hmdb_mapping.csv'
 
-        scconnect = pd.read_csv(scc_lig_path)
+        scconnect = pd.read_csv(scc_lig_path)  
         scconnect.dropna(subset=['PubChem CID'], inplace=True)
         scconnect = scconnect[scconnect['Type'].isin(['Metabolite', 'Inorganic'])]
         interactions = pd.read_csv(scc_int_path)
@@ -77,15 +77,19 @@ class ScconnectAdapter:
 
         interactions['type'] = interactions['type'].replace('Agonist', 'activation')
         interactions['type'] = interactions['type'].replace('Antagonist', 'inhibition')
+        interactions['type'] = interactions['type'].replace('Modulator', 'inhibition')
+        interactions['type'] = interactions['type'].replace('Inhibitor', 'inhibition')
+        interactions['type'] = interactions['type'].replace('Activator', 'activation')
+        interactions['type'] = interactions['type'].replace('Channel blocker', 'inhibition')
+        interactions['type'] = interactions['type'].replace('Allosteric modulator', 'inhibition')
+        interactions['type'] = interactions['type'].replace('Gating inhibitor', 'inhibition')
+
 
         hmdb = pd.read_csv(hmdb_path)
         hmdb.dropna(subset=['pubchem_id'], inplace=True)
         hmdb_dict = dict(zip( hmdb['pubchem_id'].astype(int), hmdb['accession']))
         interactions['hmdb'] = interactions['PubChem CID'].astype(int).map(hmdb_dict)
         interactions.dropna(subset=['hmdb'], inplace=True)
-
-        # missing_symbols = pd.read_csv('data/mapping_tables/missing_symbols.csv')
-        # missing_symbols_dict = dict(zip(missing_symbols['symbol'], missing_symbols['uniprot']))
 
         for row in interactions.iterrows():
             attributes  = {
