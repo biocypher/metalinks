@@ -67,6 +67,7 @@ class CellinkerAdapter:
         cellinker = cellinker.dropna(subset=['ligand_pubchem_cid'])
         hmdb = hmdb.dropna(subset=['pubchem_id'])
         hmdb_dict = dict(zip(hmdb['pubchem_id'].astype(int), hmdb['accession']))
+        
 
         cellinker['ligand_pubchem_cid'] = cellinker['ligand_pubchem_cid'].astype(int)
         cellinker['HMDB'] = cellinker['ligand_pubchem_cid'].map(hmdb_dict)
