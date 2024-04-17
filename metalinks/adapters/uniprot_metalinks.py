@@ -1,12 +1,11 @@
 # adapted from crossbar project https://github.com/HUBioDataLab/CROssBAR-BioCypher-Migration
 
 from time import time
-import collections
-from typing import Dict, List, Optional
+from typing import Optional
 from enum import Enum, auto
 from functools import lru_cache
 import pandas as pd
-import os
+import re
 
 from tqdm import tqdm  # progress bar
 from pypath.share import curl, settings
@@ -46,6 +45,8 @@ class UniprotNodeField(Enum):
     PROTEIN_EC = "ec"
     PROTEIN_GENE_NAMES = "gene_names"
     PRIMARY_GENE_NAME = "gene_primary"
+    PROTEIN_CC_DISEASE = "cc_disease"
+    
     # xref attributes
     PROTEIN_ENSEMBL_TRANSCRIPT_IDS = "xref_ensembl"
     PROTEIN_PROTEOME = "xref_proteomes"
@@ -78,8 +79,6 @@ class Uniprot:
         rev=True,
         node_types: Optional[list] = None,
         node_fields: Optional[list] = None,
-        edge_types: Optional[list] = None,
-        edge_fields: Optional[list] = None,
         normalise_curies: bool = True,
         test_mode: bool = False,
     ):
@@ -223,7 +222,6 @@ class Uniprot:
             ]:
                 for protein, attribute_value in self.data.get(arg).items():
                     self.data[arg][protein] = int(str(attribute_value).replace(",", ""))
-
             # Simple replace
             elif arg not in self.split_fields:
                 if not arg in [
@@ -276,7 +274,6 @@ class Uniprot:
             elif arg == UniprotNodeField.PROTEIN_VIRUS_HOSTS.value:
 
                 for protein, attribute_value in self.data.get(arg).items():
-
                     self.data[arg][protein] = self._split_virus_hosts_field(
                         attribute_value
                     )
@@ -296,7 +293,9 @@ class Uniprot:
                         self.locations.add(loc)
 
                     self.data[arg][protein] = individual_protein_locations
-
+            elif arg == UniprotNodeField.PROTEIN_CC_DISEASE.value:
+                for protein, attribute_value in self.data.get(arg).items():
+                    self.data[arg][protein] = self._get_mim_ids(attribute_value)
     def get_nodes(self):
         """
         Yield nodes (protein, gene, organism) from UniProt data.
@@ -492,6 +491,18 @@ class Uniprot:
         protein_props["version"] = self.data_version
 
         return protein_props
+    
+    def _get_mim_ids(self, text):
+        """
+        Split and extract MIM IDs from the text field in UniProt.
+        
+        Args:
+            text: text field in UniProt
+        Example:
+            "Defects in ABCA4 are the cause of Stargardt disease (STGD1) [MIM:248200]." -> ['248200']
+        """
+        mim_ids = re.findall(r'\[MIM:(\d+)\]', text)
+        return mim_ids
 
     def _split_fields(self, field_key, field_value):
         """
