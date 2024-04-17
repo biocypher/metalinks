@@ -722,6 +722,8 @@ class Uniprot:
             UniprotNodeField.PROTEIN_NAMES.value,
             UniprotNodeField.PROTEIN_PROTEOME.value,
             UniprotNodeField.PROTEIN_EC.value,
+            UniprotNodeField.PROTEIN_CC_DISEASE.value,
+            UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION.value,
             UniprotNodeField.PROTEIN_VIRUS_HOSTS.value,
             UniprotNodeField.PROTEIN_ORGANISM_ID.value,
         ]

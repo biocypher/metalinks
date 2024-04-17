@@ -37,7 +37,7 @@ protein:
     virus_hosts: int[] 
     symbol : str
     subcellular_location: str[]
-    disease_cc: int[]
+    cc_disease: int[]
     receptor_type: str
 
 # Edges
