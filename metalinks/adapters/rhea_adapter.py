@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-BioCypher - recon adapter prototype
+BioCypher - rhea adapter
 """
 
 from enum import Enum

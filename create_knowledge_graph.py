@@ -116,7 +116,8 @@ uniprot_node_fields = [
     UniprotNodeField.PROTEIN_KEGG_IDS,
     UniprotNodeField.PROTEIN_SYMBOL,
     UniprotNodeField.PROTEIN_RECEPTOR_TYPE,
-    # UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION,
+    UniprotNodeField.PROTEIN_CC_DISEASE,
+    UniprotNodeField.PROTEIN_SUBCELLULAR_LOCATION
 ]
 
 hmdb_edge_types = [
@@ -372,7 +373,6 @@ def main():
     )
 
     # write nodes and edges to csv
-
     bc.write_nodes(HMDB.get_nodes())
     bc.write_edges(CELLPHONE.get_edges())
     bc.write_edges(NEURONCHAT.get_edges())
@@ -384,8 +384,6 @@ def main():
     bc.write_edges(RHEA.get_edges())
     bc.write_edges(HMDB.get_edges())
     bc.write_nodes(UNIPROT.get_nodes())
-    
-
 
     # convenience and stats
     bc.write_import_call()
@@ -404,8 +402,6 @@ def main():
         ps.print_stats()
 
         ps.dump_stats("adapter.prof")
-        # look at stats using snakeviz
-
 
 if __name__ == "__main__":
     main()
