@@ -165,11 +165,12 @@ from a Metalinks Neo4j dump, available at https://zenodo.org/records/10200150"""
 //EdgeTable
 MATCH (m)-[a]->(p:Protein)
 WHERE 
-  (type(a) IN ['StitchMetaboliteReceptor', 'NeuronchatMetaboliteReceptor', 'CellphoneMetaboliteReceptor'] AND 
-  ((type(a) = 'StitchMetaboliteReceptor' AND (a.database > 500 OR a.experiment > 500 OR a.combined_score > 700)) OR
-  (type(a) <> 'StitchMetaboliteReceptor')))
+type(a) IN ['CellinkerMetaboliteReceptor', 'ScconnectMetaboliteReceptor', 'StitchMetaboliteReceptor', 'NeuronchatMetaboliteReceptor', 'CellphoneMetaboliteReceptor'] 
+AND ((a.database >= 200 OR a.experiment >= 300 OR a.predicted >= 700 OR a.combined_score >= 900) OR
+  (type(a) <> 'StitchMetaboliteReceptor'))
 AND ANY(value in m.cellular_locations WHERE value = 'Extracellular')
-AND NOT a.mode in ['reaction', 'catalysis', 'expression', 'pred_binding']
+AND ((p.receptor_type in ['catalytic_receptor', 'gpcr', 'nhr']) OR ((p.receptor_type in ['lgic',  'other_ic', 'transporter', 'vgic'] AND a.mode in ['activation', 'inhibition'])))
+AND NOT a.mode in ['reaction', 'catalysis', 'expression']
 WITH DISTINCT m.id AS hmdb, REPLACE(p.id, "uniprot:", "") AS uniprot, a
 RETURN 
   hmdb,
@@ -177,8 +178,10 @@ RETURN
   COLLECT(DISTINCT CASE WHEN type(a) = 'StitchMetaboliteReceptor' THEN 'Stitch'
                         WHEN type(a) = 'NeuronchatMetaboliteReceptor' THEN 'NeuronChat'
                         WHEN type(a) = 'CellphoneMetaboliteReceptor' THEN 'CellPhoneDB'
+                        WHEN type(a) = 'ScconnectMetaboliteReceptor' THEN 'scConnect'
+                        WHEN type(a) = 'CellinkerMetaboliteReceptor' THEN 'Cellinker'
                         ELSE 'Other'
-            END) AS sources,
+            END) AS source,
   MAX(a.database) AS db_score,
   MAX(a.experiment) AS experiment_score,
   MAX(a.combined_score) AS combined_score,
@@ -186,18 +189,19 @@ RETURN
                     WHEN 'activation' THEN 1
                     WHEN 'inhibition' THEN -1
                     ELSE 0
-            END) AS mor_modes
+            END) AS mor
 """
 
 """
 //MetaboliteTable
 MATCH (m)-[a]->(p:Protein)
 WHERE 
-  (type(a) IN ['StitchMetaboliteReceptor', 'NeuronchatMetaboliteReceptor', 'CellphoneMetaboliteReceptor'] AND 
-  ((type(a) = 'StitchMetaboliteReceptor' AND (a.database > 500 OR a.experiment > 500 OR a.combined_score > 700)) OR
-  (type(a) <> 'StitchMetaboliteReceptor')))
+type(a) IN ['CellinkerMetaboliteReceptor', 'ScconnectMetaboliteReceptor', 'StitchMetaboliteReceptor', 'NeuronchatMetaboliteReceptor', 'CellphoneMetaboliteReceptor'] 
+AND ((a.database >= 200 OR a.experiment >= 300 OR a.predicted >= 700 OR a.combined_score >= 900) OR
+  (type(a) <> 'StitchMetaboliteReceptor'))
 AND ANY(value in m.cellular_locations WHERE value = 'Extracellular')
-AND NOT a.mode in ['reaction', 'catalysis', 'expression', 'pred_binding']
+AND ((p.receptor_type in ['catalytic_receptor', 'gpcr', 'nhr']) OR ((p.receptor_type in ['lgic',  'other_ic', 'transporter', 'vgic'] AND a.mode in ['activation', 'inhibition'])))
+AND NOT a.mode in ['reaction', 'catalysis', 'expression']
 RETURN 
   DISTINCT m.id as hmdb,
   m.name as metabolite,
