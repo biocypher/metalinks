@@ -177,6 +177,7 @@ stitch_edge_fields = [
     STITCHMetaboliteToProteinEdgeField.PREDICTION,
     STITCHMetaboliteToProteinEdgeField.TEXTMINING,
     STITCHMetaboliteToProteinEdgeField.COMBINED_SCORE,
+    STITCHMetaboliteToProteinEdgeField.REFERENCES,
 ]
 
 
@@ -221,6 +222,7 @@ cellphone_edge_fields = [
     CellphoneMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
     CellphoneMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
     CellphoneMetaboliteToProteinEdgeField.MODE,
+    CellphoneMetaboliteToProteinEdgeField.REFERENCES,
 ]
 
 neuronchat_edge_fields = [
@@ -228,6 +230,7 @@ neuronchat_edge_fields = [
     NeuronchatMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
     NeuronchatMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
     NeuronchatMetaboliteToProteinEdgeField.MODE,
+    NeuronchatMetaboliteToProteinEdgeField.REFERENCES,
 ]
 
 cellinker_edge_fields = [
@@ -235,6 +238,7 @@ cellinker_edge_fields = [
     CellinkerMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
     CellinkerMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
     CellinkerMetaboliteToProteinEdgeField.MODE,
+    CellinkerMetaboliteToProteinEdgeField.REFERENCES,
 ]
 
 scconnect_edge_fields = [
@@ -242,6 +246,7 @@ scconnect_edge_fields = [
     ScconnectMetaboliteToProteinEdgeField._PRIMARY_TARGET_ID,
     ScconnectMetaboliteToProteinEdgeField._PRIMARY_REACTION_ID,
     ScconnectMetaboliteToProteinEdgeField.MODE,
+    ScconnectMetaboliteToProteinEdgeField.REFERENCES,
 ]
 
 

@@ -37,6 +37,7 @@ class NeuronchatMetaboliteToProteinEdgeField(Enum):
     _PRIMARY_REACTION_ID = 'REACTION_ID'
 
     MODE = 'mode'
+    REFERENCES = 'references'
 
 
 class NeuronchatAdapter:
@@ -84,7 +85,8 @@ class NeuronchatAdapter:
                     print(f"Symbol {row[1]['gene']} not found in mapping tables.")
                     continue
             attributes  = {
-                'mode': 'activation'
+                'mode': 'activation', 
+                'references': ''
             }
             id = 'uniprot:' + row[1]['uniprot'].pop()
             r = row[1].astype(str)

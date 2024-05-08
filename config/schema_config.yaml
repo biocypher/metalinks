@@ -119,6 +119,7 @@ stitch metabolite receptor:
       prediction: int
       textmining: int
       combined_score: int
+      references: str[]
 
 cellphone metabolite receptor:
   is_a: association
@@ -128,6 +129,7 @@ cellphone metabolite receptor:
   label_in_input: CP
   properties:
       mode: str
+      references: str[]
 
 neuronchat metabolite receptor:
   is_a: association
@@ -137,6 +139,7 @@ neuronchat metabolite receptor:
   label_in_input: NC
   properties:
       mode: str
+      references: str[]
 
 cellinker metabolite receptor:
   is_a: association
@@ -146,6 +149,7 @@ cellinker metabolite receptor:
   label_in_input: CL
   properties:
       mode: str
+      references: str[]
 
 scconnect metabolite receptor:
   is_a: association
@@ -155,5 +159,6 @@ scconnect metabolite receptor:
   label_in_input: SCC
   properties:
       mode: str
+      references: str[]
 
 

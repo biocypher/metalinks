@@ -37,6 +37,7 @@ class CellinkerMetaboliteToProteinEdgeField(Enum):
     _PRIMARY_REACTION_ID = 'REACTION_ID'
 
     MODE = 'mode'
+    REFERENCES = 'references'
 
 
 class CellinkerAdapter:
@@ -68,12 +69,14 @@ class CellinkerAdapter:
         hmdb = hmdb.dropna(subset=['pubchem_id'])
         hmdb_dict = dict(zip(hmdb['pubchem_id'].astype(int), hmdb['accession']))
         
-
         cellinker['ligand_pubchem_cid'] = cellinker['ligand_pubchem_cid'].astype(int)
         cellinker['HMDB'] = cellinker['ligand_pubchem_cid'].map(hmdb_dict)
         cellinker.dropna(subset=['HMDB'], inplace=True)
         cellinker.dropna(subset=['Receptor_symbol'], inplace=True)
         cellinker.drop_duplicates(inplace=True)
+        cellinker.rename(columns={'pubmed_id': 'references'}, inplace=True)
+        # split references into list at ';' and add a PMID: prefix
+        cellinker['references'] = cellinker['references'].str.split(';').apply(lambda x: ['PMID:' + i for i in x])
         
         cellinker.rename(columns={'Receptor_uniprot': 'uniprot'}, inplace=True)
         
@@ -82,7 +85,8 @@ class CellinkerAdapter:
                 print(row[1]['Receptor_symbol'])
                 continue
             attributes  = {
-                'mode': 'activation'
+                'mode': 'activation',
+                'references': row[1]['references']
             }
             id = 'uniprot:' + row[1]['uniprot']
             r = row[1].astype(str)

@@ -37,6 +37,7 @@ class CellphoneMetaboliteToProteinEdgeField(Enum):
     _PRIMARY_REACTION_ID = 'REACTION_ID'
 
     MODE = 'mode'
+    REFERENCES = 'references'
 
 
 class CellphoneAdapter:
@@ -64,6 +65,8 @@ class CellphoneAdapter:
         cpdb['uniprot'] = cpdb['symbol'].apply(lambda x: mapping.map_name(x, 'genesymbol', 'uniprot'))
 
         cpdb.dropna(subset=['symbol', 'Chebi/HMDB_name_a'], inplace=True)
+        cpdb.rename(columns={'source': 'references'}, inplace=True)
+        cpdb['references'] = cpdb['references'].apply(lambda x: x.split(';'))
 
         missing_symbols = pd.read_csv('data/mapping_tables/missing_symbols.csv')
         missing_symbols_dict = dict(zip(missing_symbols['symbol'], missing_symbols['uniprot']))
@@ -76,7 +79,8 @@ class CellphoneAdapter:
                     print(f"Symbol {row[1]['symbol']} not found in mapping tables.")
                     continue
             attributes  = {
-                'mode': 'activation'
+                'mode': 'activation',
+                'references': row[1]['references']
             }
             id = 'uniprot:' + row[1]['uniprot'].pop()
             r = row[1].astype(str)

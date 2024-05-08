@@ -43,6 +43,7 @@ class STITCHMetaboliteToProteinEdgeField(Enum):
     PREDICTION = "prediction"
     TEXTMINING = "textmining"
     COMBINED_SCORE = "combined_score"
+    REFERENCES = "references"
 
 
 class STITCHAdapter:
@@ -128,6 +129,7 @@ class STITCHAdapter:
                 'prediction': row[4],
                 'textmining': row[5],
                 'combined_score': row[6],
+                'references': ''
             }
 
             yield str(row[9]), row[8], row[10], 'MR', attributes # only temporary fix 

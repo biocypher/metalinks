@@ -37,6 +37,7 @@ class ScconnectMetaboliteToProteinEdgeField(Enum):
     _PRIMARY_REACTION_ID = 'REACTION_ID'
 
     MODE = 'mode'
+    REFERENCES = 'references'
 
 
 class ScconnectAdapter:
@@ -67,7 +68,7 @@ class ScconnectAdapter:
         scconnect = scconnect[scconnect['Type'].isin(['Metabolite', 'Inorganic'])]
         interactions = pd.read_csv(scc_int_path)
         interactions = interactions[interactions['ligand'].isin(scconnect['Name'])]
-        interactions = interactions[['ligand', 'target', 'target_uniprot', 'type']]
+        interactions = interactions[['ligand', 'target', 'target_uniprot', 'type', 'pubmed_id']]
         interactions = interactions.merge(scconnect[['Name', 'PubChem CID']], left_on='ligand', right_on='Name')
         interactions.drop(columns=['Name'], inplace=True)
         interactions.drop_duplicates(inplace=True)
@@ -90,10 +91,14 @@ class ScconnectAdapter:
         hmdb_dict = dict(zip( hmdb['pubchem_id'].astype(int), hmdb['accession']))
         interactions['hmdb'] = interactions['PubChem CID'].astype(int).map(hmdb_dict)
         interactions.dropna(subset=['hmdb'], inplace=True)
+        interactions.rename(columns={'pubmed_id': 'references'}, inplace=True)
+        interactions['references'].fillna('', inplace=True)
+        interactions['references'] = interactions['references'].str.split('|').apply(lambda x: ['PMID:' + i for i in x if i != ''])
 
         for row in interactions.iterrows():
             attributes  = {
-                'mode': row[1]['type']
+                'mode': row[1]['type'],
+                'references': row[1]['references']
             }
             id = 'uniprot:' + row[1]['uniprot']
             r = row[1].astype(str)
