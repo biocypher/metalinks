@@ -37,3 +37,15 @@ python create_knowledge_graph.py
 All additional files and a webpage dump can be found here:
 [zenodo](https://zenodo.org/records/10200150)
 
+## Simple MetalinksDB Access / Generating an SQL Database
+
+To generate a sqlite3 database from the knowledge graph, run the following within the created environment:
+
+1. Load a neo4j dump using a neo4j instance following running `create_knowledge_graph.py`.
+Alternatively, a dump of the database used in the paper is available here https://zenodo.org/records/11066196, preferably use neo4j v4.4.32 if loading this dump.
+2. Export the knowledge graph to a csv files, see the queries in create_sqlite_db.py
+3. Run the create_sqlite_db.py script to generate the sqlite3 database.
+
+We also provide MetalinkDB as csv files: https://github.com/saezlab/MetalinksDB/tree/main/metalinksDB
+
+MetalinksDB is also queryable via LIANA+: https://liana-py.readthedocs.io/en/latest/notebooks/prior_knowledge.html#Metabolite-Receptor-Interactions
