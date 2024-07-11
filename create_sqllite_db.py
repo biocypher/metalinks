@@ -50,7 +50,10 @@ def create_table_query(annotation):
     return query
 
 # Connect to the SQLite database (or create it if it doesn't exist)
-conn = sqlite3.connect(path.join('data', 'metalinks.db'))
+db_path = path.join('data', 'metalinks.db')
+if path.exists(db_path):
+    remove(db_path)
+conn = sqlite3.connect(db_path)
 conn.execute("PRAGMA foreign_keys = ON;")
 
 # Load the data
@@ -153,7 +156,7 @@ try:
         
 except Exception as e:
     print(e)
-    remove('metalinks.db')
+    remove(db_path)
 finally:
     conn.close()
     
