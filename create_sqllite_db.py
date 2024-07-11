@@ -57,31 +57,6 @@ conn = sqlite3.connect(db_path)
 conn.execute("PRAGMA foreign_keys = ON;")
 
 # Load the data
-## Metabolites
-mets = pd.read_csv(path.join('data', 'MetaboliteTable.csv'))
-# TODO: Fix this issue in the Cypher query
-mets['hmdb'] = mets['hmdb'].replace(to_replace='"', value='', regex=True)
-mets['metabolite'] = mets['metabolite'].replace(to_replace='"', value='', regex=True)
-mets['pubchem'] = mets['pubchem'].apply(lambda x: '' if np.isnan(x) else str(int(x)))
-for column in mets.columns:
-    if column not in ['hmdb', 'metabolite', 'pubchem']:
-        mets[column] = mets[column].apply(lambda x: literal_eval(x) if pd.notnull(x) else x)
-
-# Create Metabolite Annotation DataFrames
-columns_of_interest = ['cell_location', 'tissue_location', 'biospecimen_location', 'disease', 'pathway']
-expanded_dataframes = {}
-
-for column_name in columns_of_interest:
-    df = expand_list_column(mets, column_name)
-    expanded_dataframes[column_name] = df
-
-# Proteins
-prots = pd.read_csv(path.join('data', 'ProteinTable.csv'))
-
-# TODO: Fix this issue in the Cypher query
-prots['uniprot'] = prots['uniprot'].replace(to_replace='"', value='', regex=True)
-prots['gene_symbol'] = prots['gene_symbol'].replace(to_replace='"', value='', regex=True)
-
 # Metabolite-Protein Edges (Ligand-Receptor)
 edges = pd.read_csv(path.join('data', 'EdgeTable.csv'))
 edges['type'] = 'lr'
@@ -97,6 +72,32 @@ edges['mor'] = edges['mor'].apply(lambda x: literal_eval(x) if isinstance(x, str
 # Create a DataFrame for Sources
 edges = edges.replace(to_replace='"', value='', regex=True)
 edges = edges.explode('source').explode('mor').drop_duplicates()
+
+
+## Metabolites
+mets = pd.read_csv(path.join('data', 'MetaboliteTable.csv'))
+# TODO: Fix this issue in the Cypher query
+mets['hmdb'] = mets['hmdb'].replace(to_replace='"', value='', regex=True)
+mets['metabolite'] = mets['metabolite'].replace(to_replace='"', value='', regex=True)
+mets['pubchem'] = mets['pubchem'].apply(lambda x: '' if np.isnan(x) else str(int(x)))
+mets = mets[mets['hmdb'].isin(edges['hmdb'])].drop_duplicates()
+for column in mets.columns:
+    if column not in ['hmdb', 'metabolite', 'pubchem']:
+        mets[column] = mets[column].apply(lambda x: literal_eval(x) if pd.notnull(x) else x)
+
+# Create Metabolite Annotation DataFrames
+columns_of_interest = ['cell_location', 'tissue_location', 'biospecimen_location', 'disease', 'pathway']
+expanded_dataframes = {}
+
+for column_name in columns_of_interest:
+    df = expand_list_column(mets, column_name)
+    expanded_dataframes[column_name] = df
+
+# Proteins
+prots = pd.read_csv(path.join('data', 'ProteinTable.csv'))
+prots['uniprot'] = prots['uniprot'].replace(to_replace='"', value='', regex=True)
+prots['gene_symbol'] = prots['gene_symbol'].replace(to_replace='"', value='', regex=True)
+prots = prots[prots['uniprot'].isin(edges['uniprot'])].drop_duplicates()
 
 ### Create the SQL Tables
 create_metabolites_table = """
@@ -219,15 +220,7 @@ COLLECT(CASE a.direction
 """
 //MetaboliteTable
 MATCH (m)-[a]->(p:Protein)
-WHERE 
-type(a) IN ['CellinkerMetaboliteReceptor', 'ScconnectMetaboliteReceptor', 'StitchMetaboliteReceptor', 'NeuronchatMetaboliteReceptor', 'CellphoneMetaboliteReceptor'] 
-AND ((a.database >= 200 OR a.experiment >= 300 OR a.predicted >= 700 OR a.combined_score >= 900) OR
-  (type(a) <> 'StitchMetaboliteReceptor'))
-AND ANY(value in m.cellular_locations WHERE value = 'Extracellular')
-AND ((p.receptor_type in ['catalytic_receptor', 'gpcr', 'nhr']) OR ((p.receptor_type in ['lgic',  'other_ic', 'transporter', 'vgic'] AND a.mode in ['activation', 'inhibition'])))
-AND NOT a.mode in ['reaction', 'catalysis', 'expression']
-RETURN 
-  DISTINCT m.id as hmdb,
+RETURN DISTINCT m.id as hmdb,
   m.name as metabolite,
   m.pubchem_compound_id as pubchem,
   m.cellular_locations as cell_location,
@@ -241,16 +234,6 @@ RETURN
 """
 //ProteinTable
 MATCH (m)-[a]->(p:Protein)
-WHERE 
-  type(a) IN ['StitchMetaboliteReceptor', 'NeuronchatMetaboliteReceptor', 'CellphoneMetaboliteReceptor']
-  AND (
-    (type(a) = 'StitchMetaboliteReceptor' AND 
-     (a.database >= 200 OR a.experiment >= 300 OR a.predicted >= 700 OR a.combined_score >= 900)
-    )
-    OR type(a) <> 'StitchMetaboliteReceptor'
-  )
-  AND NOT a.mode IN ['reaction', 'catalysis', 'expression', 'pred_binding']
-  AND ANY(value IN m.cellular_locations WHERE value = 'Extracellular')
 RETURN DISTINCT
   REPLACE(p.id, "uniprot:", "") as uniprot,
   p.symbol as gene_symbol,
