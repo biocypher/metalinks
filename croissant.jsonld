@@ -1,0 +1,537 @@
+{
+  "@context": {
+    "@language": "en",
+    "@vocab": "https://schema.org/",
+    "sc": "https://schema.org/",
+    "cr": "http://mlcommons.org/croissant/",
+    "rai": "http://mlcommons.org/croissant/RAI/",
+    "dct": "http://purl.org/dc/terms/",
+    "bsc": "https://bioschemas.org/profiles/Dataset/1.0-RELEASE/",
+    "citeAs": "cr:citeAs",
+    "column": "cr:column",
+    "conformsTo": "dct:conformsTo",
+    "data": {
+      "@id": "cr:data",
+      "@type": "@json"
+    },
+    "dataType": {
+      "@id": "cr:dataType",
+      "@type": "@vocab"
+    },
+    "examples": {
+      "@id": "cr:examples",
+      "@type": "@json"
+    },
+    "extract": "cr:extract",
+    "field": "cr:field",
+    "fileProperty": "cr:fileProperty",
+    "fileObject": "cr:fileObject",
+    "fileSet": "cr:fileSet",
+    "format": "cr:format",
+    "includes": "cr:includes",
+    "isLiveDataset": "cr:isLiveDataset",
+    "jsonPath": "cr:jsonPath",
+    "key": "cr:key",
+    "md5": "cr:md5",
+    "parentField": "cr:parentField",
+    "path": "cr:path",
+    "recordSet": "cr:recordSet",
+    "references": "cr:references",
+    "regex": "cr:regex",
+    "repeated": "cr:repeated",
+    "replace": "cr:replace",
+    "samplingRate": "cr:samplingRate",
+    "separator": "cr:separator",
+    "source": "cr:source",
+    "subField": "cr:subField",
+    "transform": "cr:transform",
+    "@base": "cr_base_iri/"
+  },
+  "@type": "SoftwareSourceCode",
+  "dct:conformsTo": "https://bioschemas.org/profiles/ComputationalTool/1.0-RELEASE/",
+  "@id": "metalinksdb-biocypher-adapter",
+  "name": "MetalinksDB BioCypher Adapter",
+  "description": "A BioCypher adapter that integrates and curates metabolite–protein interaction data to generate the MetalinksDB knowledge graph.",
+  "version": "0.1.0",
+  "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "codeRepository": "https://github.com/biocypher/metalinks",
+  "creator": [
+    {
+      "@type": "Person",
+      "name": "Elias Farr",
+      "affiliation": "University Hospital Heidelberg"
+    }
+  ],
+  "keywords": [
+    "MetalinksDB"
+  ],
+  "hasPart": [
+    {
+      "@type": "sc:Dataset",
+      "name": "STITCH interaction actions",
+      "description": "STITCH interaction actions for human protein–chemical interactions. The action column may be blank.",
+      "conformsTo": "http://mlcommons.org/croissant/1.0",
+      "datePublished": "2023-11-23T00:00:00Z",
+      "license": "UNKNOWN",
+      "url": "https://zenodo.org/records/10200150/files/9606.actions.v5.0.tsv?download=1",
+      "version": "1.0.0",
+      "distribution": [
+        {
+          "@type": "cr:FileObject",
+          "@id": "stitch-interaction-actions-1/file_0",
+          "name": "9606.actions.v5.0.tsv",
+          "contentSize": "1081387536",
+          "contentUrl": "9606.actions.v5.0.tsv",
+          "encodingFormat": "text/tab-separated-values",
+          "sha256": "ae37a0800f220e414680cbf6720ac5f8c4668ed46310445d6700c94c34a849d8"
+        }
+      ],
+      "recordSet": [
+        {
+          "@type": "cr:RecordSet",
+          "@id": "stitch-interaction-actions-1/9606.actions.v5.0",
+          "name": "stitch-interaction-actions-1/9606.actions.v5.0",
+          "description": "Records from 9606.actions.v5.0.tsv",
+          "field": [
+            {
+              "@type": "cr:Field",
+              "name": "item_id_a",
+              "@id": "stitch-interaction-actions-1/9606.actions.v5.0/item_id_a",
+              "dataType": "sc:Text",
+              "description": "Column 'item_id_a' from 9606.actions.v5.0.tsv",
+              "source": {
+                "@id": "stitch-interaction-actions-1/9606.actions.v5.0/item_id_a/source",
+                "fileObject": {
+                  "@id": "stitch-interaction-actions-1/file_0"
+                },
+                "extract": {
+                  "column": "item_id_a"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "item_id_b",
+              "@id": "stitch-interaction-actions-1/9606.actions.v5.0/item_id_b",
+              "dataType": "sc:Text",
+              "description": "Column 'item_id_b' from 9606.actions.v5.0.tsv",
+              "source": {
+                "@id": "stitch-interaction-actions-1/9606.actions.v5.0/item_id_b/source",
+                "fileObject": {
+                  "@id": "stitch-interaction-actions-1/file_0"
+                },
+                "extract": {
+                  "column": "item_id_b"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "mode",
+              "@id": "stitch-interaction-actions-1/9606.actions.v5.0/mode",
+              "dataType": "sc:Text",
+              "description": "Column 'mode' from 9606.actions.v5.0.tsv",
+              "source": {
+                "@id": "stitch-interaction-actions-1/9606.actions.v5.0/mode/source",
+                "fileObject": {
+                  "@id": "stitch-interaction-actions-1/file_0"
+                },
+                "extract": {
+                  "column": "mode"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "action",
+              "@id": "stitch-interaction-actions-1/9606.actions.v5.0/action",
+              "dataType": "sc:Text",
+              "description": "Column 'action' from 9606.actions.v5.0.tsv",
+              "source": {
+                "@id": "stitch-interaction-actions-1/9606.actions.v5.0/action/source",
+                "fileObject": {
+                  "@id": "stitch-interaction-actions-1/file_0"
+                },
+                "extract": {
+                  "column": "action"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "a_is_acting",
+              "@id": "stitch-interaction-actions-1/9606.actions.v5.0/a_is_acting",
+              "dataType": "sc:Text",
+              "description": "Column 'a_is_acting' from 9606.actions.v5.0.tsv",
+              "source": {
+                "@id": "stitch-interaction-actions-1/9606.actions.v5.0/a_is_acting/source",
+                "fileObject": {
+                  "@id": "stitch-interaction-actions-1/file_0"
+                },
+                "extract": {
+                  "column": "a_is_acting"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "score",
+              "@id": "stitch-interaction-actions-1/9606.actions.v5.0/score",
+              "dataType": "sc:Integer",
+              "description": "Column 'score' from 9606.actions.v5.0.tsv",
+              "source": {
+                "@id": "stitch-interaction-actions-1/9606.actions.v5.0/score/source",
+                "fileObject": {
+                  "@id": "stitch-interaction-actions-1/file_0"
+                },
+                "extract": {
+                  "column": "score"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "sc:Dataset",
+      "name": "STITCH detailed protein–chemical links",
+      "description": "STITCH evidence scores for human protein–chemical links.",
+      "conformsTo": "http://mlcommons.org/croissant/1.0",
+      "datePublished": "2023-11-23T00:00:00Z",
+      "license": "UNKNOWN",
+      "url": "https://zenodo.org/records/10200150/files/9606.protein_chemical.links.detailed.v5.0.tsv?download=1",
+      "version": "1.0.0",
+      "distribution": [
+        {
+          "@type": "cr:FileObject",
+          "@id": "stitch-detailed-protein–chemical-links-2/file_0",
+          "name": "9606.protein_chemical.links.detailed.v5.0.tsv",
+          "contentSize": "745016311",
+          "contentUrl": "9606.protein_chemical.links.detailed.v5.0.tsv",
+          "encodingFormat": "text/tab-separated-values",
+          "sha256": "309c0af55cef4eebfebc3d0deec080da88f3efb7652c415bc664dacc02cb2736"
+        }
+      ],
+      "recordSet": [
+        {
+          "@type": "cr:RecordSet",
+          "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0",
+          "name": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0",
+          "description": "Records from 9606.protein_chemical.links.detailed.v5.0.tsv",
+          "field": [
+            {
+              "@type": "cr:Field",
+              "name": "chemical",
+              "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/chemical",
+              "dataType": "sc:Text",
+              "description": "Column 'chemical' from 9606.protein_chemical.links.detailed.v5.0.tsv",
+              "source": {
+                "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/chemical/source",
+                "fileObject": {
+                  "@id": "stitch-detailed-protein–chemical-links-2/file_0"
+                },
+                "extract": {
+                  "column": "chemical"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "protein",
+              "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/protein",
+              "dataType": "sc:Text",
+              "description": "Column 'protein' from 9606.protein_chemical.links.detailed.v5.0.tsv",
+              "source": {
+                "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/protein/source",
+                "fileObject": {
+                  "@id": "stitch-detailed-protein–chemical-links-2/file_0"
+                },
+                "extract": {
+                  "column": "protein"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "experimental",
+              "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/experimental",
+              "dataType": "sc:Boolean",
+              "description": "Column 'experimental' from 9606.protein_chemical.links.detailed.v5.0.tsv",
+              "source": {
+                "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/experimental/source",
+                "fileObject": {
+                  "@id": "stitch-detailed-protein–chemical-links-2/file_0"
+                },
+                "extract": {
+                  "column": "experimental"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "prediction",
+              "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/prediction",
+              "dataType": "sc:Boolean",
+              "description": "Column 'prediction' from 9606.protein_chemical.links.detailed.v5.0.tsv",
+              "source": {
+                "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/prediction/source",
+                "fileObject": {
+                  "@id": "stitch-detailed-protein–chemical-links-2/file_0"
+                },
+                "extract": {
+                  "column": "prediction"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "database",
+              "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/database",
+              "dataType": "sc:Boolean",
+              "description": "Column 'database' from 9606.protein_chemical.links.detailed.v5.0.tsv",
+              "source": {
+                "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/database/source",
+                "fileObject": {
+                  "@id": "stitch-detailed-protein–chemical-links-2/file_0"
+                },
+                "extract": {
+                  "column": "database"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "textmining",
+              "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/textmining",
+              "dataType": "sc:Integer",
+              "description": "Column 'textmining' from 9606.protein_chemical.links.detailed.v5.0.tsv",
+              "source": {
+                "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/textmining/source",
+                "fileObject": {
+                  "@id": "stitch-detailed-protein–chemical-links-2/file_0"
+                },
+                "extract": {
+                  "column": "textmining"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "combined_score",
+              "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/combined_score",
+              "dataType": "sc:Integer",
+              "description": "Column 'combined_score' from 9606.protein_chemical.links.detailed.v5.0.tsv",
+              "source": {
+                "@id": "stitch-detailed-protein–chemical-links-2/9606.protein_chemical.links.detailed.v5.0/combined_score/source",
+                "fileObject": {
+                  "@id": "stitch-detailed-protein–chemical-links-2/file_0"
+                },
+                "extract": {
+                  "column": "combined_score"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "@type": "sc:Dataset",
+      "name": "Curated metabolite identifier mappings",
+      "description": "Curated metabolite identifier mappings. The source file is tab-delimited and uses NA for missing values.",
+      "conformsTo": "http://mlcommons.org/croissant/1.0",
+      "creator": [
+        {
+          "@type": "sc:Person",
+          "name": "Elias Farr"
+        }
+      ],
+      "datePublished": "2023-11-23T00:00:00Z",
+      "license": "UNKNOWN",
+      "url": "https://zenodo.org/records/10200150/files/metmap_curated.csv?download=1",
+      "version": "1.0.0",
+      "distribution": [
+        {
+          "@type": "cr:FileObject",
+          "@id": "curated-metabolite-identifier-mappings-3/file_0",
+          "name": "metmap_curated.csv",
+          "contentSize": "111773235",
+          "contentUrl": "metmap_curated.csv",
+          "encodingFormat": "text/tab-separated-values",
+          "sha256": "092c1166f726b00755b2587acb44fbbb9e5edd98292f9c98dcb7d6c515d5af89"
+        }
+      ],
+      "recordSet": [
+        {
+          "@type": "cr:RecordSet",
+          "@id": "curated-metabolite-identifier-mappings-3/metmap_curated",
+          "name": "curated-metabolite-identifier-mappings-3/metmap_curated",
+          "description": "Records from metmap_curated.tsv",
+          "field": [
+            {
+              "@type": "cr:Field",
+              "name": "CAS",
+              "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/CAS",
+              "dataType": "sc:Text",
+              "description": "Column 'CAS' from metmap_curated.tsv",
+              "source": {
+                "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/CAS/source",
+                "fileObject": {
+                  "@id": "curated-metabolite-identifier-mappings-3/file_0"
+                },
+                "extract": {
+                  "column": "CAS"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "DTXSID",
+              "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/DTXSID",
+              "dataType": "sc:Text",
+              "description": "Column 'DTXSID' from metmap_curated.tsv",
+              "source": {
+                "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/DTXSID/source",
+                "fileObject": {
+                  "@id": "curated-metabolite-identifier-mappings-3/file_0"
+                },
+                "extract": {
+                  "column": "DTXSID"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "DTXCID",
+              "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/DTXCID",
+              "dataType": "sc:Text",
+              "description": "Column 'DTXCID' from metmap_curated.tsv",
+              "source": {
+                "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/DTXCID/source",
+                "fileObject": {
+                  "@id": "curated-metabolite-identifier-mappings-3/file_0"
+                },
+                "extract": {
+                  "column": "DTXCID"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "SID",
+              "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/SID",
+              "dataType": "sc:Text",
+              "description": "Column 'SID' from metmap_curated.tsv",
+              "source": {
+                "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/SID/source",
+                "fileObject": {
+                  "@id": "curated-metabolite-identifier-mappings-3/file_0"
+                },
+                "extract": {
+                  "column": "SID"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "CID",
+              "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/CID",
+              "dataType": "sc:Text",
+              "description": "Column 'CID' from metmap_curated.tsv",
+              "source": {
+                "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/CID/source",
+                "fileObject": {
+                  "@id": "curated-metabolite-identifier-mappings-3/file_0"
+                },
+                "extract": {
+                  "column": "CID"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "KEGG",
+              "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/KEGG",
+              "dataType": "sc:Text",
+              "description": "Column 'KEGG' from metmap_curated.tsv",
+              "source": {
+                "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/KEGG/source",
+                "fileObject": {
+                  "@id": "curated-metabolite-identifier-mappings-3/file_0"
+                },
+                "extract": {
+                  "column": "KEGG"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "ChEBI",
+              "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/ChEBI",
+              "dataType": "sc:Text",
+              "description": "Column 'ChEBI' from metmap_curated.tsv",
+              "source": {
+                "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/ChEBI/source",
+                "fileObject": {
+                  "@id": "curated-metabolite-identifier-mappings-3/file_0"
+                },
+                "extract": {
+                  "column": "ChEBI"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "HMDB",
+              "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/HMDB",
+              "dataType": "sc:Text",
+              "description": "Column 'HMDB' from metmap_curated.tsv",
+              "source": {
+                "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/HMDB/source",
+                "fileObject": {
+                  "@id": "curated-metabolite-identifier-mappings-3/file_0"
+                },
+                "extract": {
+                  "column": "HMDB"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "Drugbank",
+              "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/Drugbank",
+              "dataType": "sc:Text",
+              "description": "Column 'Drugbank' from metmap_curated.tsv",
+              "source": {
+                "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/Drugbank/source",
+                "fileObject": {
+                  "@id": "curated-metabolite-identifier-mappings-3/file_0"
+                },
+                "extract": {
+                  "column": "Drugbank"
+                }
+              }
+            },
+            {
+              "@type": "cr:Field",
+              "name": "Name",
+              "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/Name",
+              "dataType": "sc:Text",
+              "description": "Column 'Name' from metmap_curated.tsv",
+              "source": {
+                "@id": "curated-metabolite-identifier-mappings-3/metmap_curated/Name/source",
+                "fileObject": {
+                  "@id": "curated-metabolite-identifier-mappings-3/file_0"
+                },
+                "extract": {
+                  "column": "Name"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
